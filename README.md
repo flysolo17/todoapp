@@ -23,9 +23,23 @@ Before you begin, ensure you have the following installed:
    ```
 
 2. **Navigate to the Angular project directory**
-   cd isaom/isaom-web
+
+   ```bash
+    cd isaom/isaom-web
+   ```
 
 3. **Install dependencies**
+
+   ```bash
    npm install
+   ```
+
 4. **Run Angular Project**
+
+   ```bash
    ng serve
+   ```
+
+```
+
+```
