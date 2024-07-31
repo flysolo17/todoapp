@@ -91,4 +91,10 @@ class AuthRepositoryImpl(val auth : FirebaseAuth, private val firestore: Firebas
             result.invoke(UiState.Error(it.message.toString()))
         }
     }
+
+    override fun logout(result: (UiState<String>) -> Unit) {
+        result.invoke(UiState.Loading)
+        auth.signOut()
+        result.invoke(UiState.Success("Successfully Logged Out!"))
+    }
 }

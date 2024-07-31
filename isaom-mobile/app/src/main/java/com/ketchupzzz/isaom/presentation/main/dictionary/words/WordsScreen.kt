@@ -1,5 +1,8 @@
 package com.ketchupzzz.isaom.presentation.main.dictionary.words
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,6 +45,7 @@ import com.ketchupzzz.isaom.utils.generateRandomString
         events: (DictionaryEvents) -> Unit,
         dictionaryList : List<Dictionary>
     ) {
+        val context = LocalContext.current
         if (state.isLoading) {
             Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
@@ -51,7 +56,7 @@ import com.ketchupzzz.isaom.utils.generateRandomString
                 modifier =  modifier.fillMaxSize()
             ) {
                 items(dictionaryList, key = {it.id ?: generateRandomString() }) {
-                    WordCard(dictionary = it, events = events)
+                    WordCard(dictionary = it, events = events, context = context)
                 }
             }
         }
@@ -61,13 +66,16 @@ import com.ketchupzzz.isaom.utils.generateRandomString
 fun WordCard(
     modifier: Modifier = Modifier,
     dictionary: Dictionary,
-    events: (DictionaryEvents) -> Unit
+    events: (DictionaryEvents) -> Unit,
+    context: Context
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(6.dp)
-            .clickable { },
+            .clickable {
+                openLink(context,dictionary.link!!)
+            },
     ) {
         Column(modifier = modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -93,4 +101,11 @@ fun WordCard(
             Text(text = dictionary.definition ?: "No Definition" , color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.titleMedium)
         }
     }
+}
+
+fun openLink(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        data = Uri.parse(url)
+    }
+    context.startActivity(intent)
 }

@@ -30,6 +30,13 @@ data class BottomNavigationItems(
                 route = AppRouter.Dictionary.route
             ),
             BottomNavigationItems(
+                label = "Lessons",
+                selectedIcon = R.drawable.video_solid,
+                unselectedIcon = R.drawable.video_solid,
+                hasNews = false,
+                route = AppRouter.Lessons.route
+            ),
+            BottomNavigationItems(
                 label = "Profile",
                 selectedIcon = R.drawable.user_filled,
                 unselectedIcon = R.drawable.user_outlined,

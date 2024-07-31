@@ -9,6 +9,8 @@ import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryScreen
 import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryViewModel
 import com.ketchupzzz.isaom.presentation.main.home.HomeScreen
 import com.ketchupzzz.isaom.presentation.main.home.HomeViewModel
+import com.ketchupzzz.isaom.presentation.main.lessons.LessonScreen
+import com.ketchupzzz.isaom.presentation.main.lessons.LessonViewModel
 import com.ketchupzzz.isaom.presentation.main.profle.ProfileScreen
 import com.ketchupzzz.isaom.presentation.main.profle.ProfileViewModel
 
@@ -25,6 +27,11 @@ fun MainNavGraph(navHostController: NavHostController) {
         composable(route = AppRouter.Dictionary.route) {
             val viewModel = hiltViewModel<DictionaryViewModel>()
             DictionaryScreen(navHostController = navHostController, state = viewModel.state, events = viewModel::events )
+        }
+
+        composable(route = AppRouter.Lessons.route) {
+            val viewModel = hiltViewModel<LessonViewModel>()
+            LessonScreen(navHostController = navHostController, state = viewModel.state, events = viewModel::events )
         }
         composable(route = AppRouter.ProfileScreen.route) {
             val viewModel = hiltViewModel<ProfileViewModel>()

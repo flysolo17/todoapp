@@ -9,6 +9,8 @@ import com.ketchupzzz.isaom.repository.dictionary.DictionaryRepository
 import com.ketchupzzz.isaom.repository.dictionary.DictionaryRepositoryImpl
 import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.repository.auth.AuthRepositoryImpl
+import com.ketchupzzz.isaom.repository.lessons.LessonRepository
+import com.ketchupzzz.isaom.repository.lessons.LessonRepositoryImpl
 import com.ketchupzzz.isaom.repository.sections.SectionRepository
 import com.ketchupzzz.isaom.repository.sections.SectionRepositoryImpl
 import com.ketchupzzz.isaom.repository.translator.TranslatorRepository
@@ -54,6 +56,14 @@ object AppModule {
         firestore: FirebaseFirestore
     ) : DictionaryRepository {
         return DictionaryRepositoryImpl(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLessonRepository(
+        firestore: FirebaseFirestore
+    ) : LessonRepository {
+        return LessonRepositoryImpl(firestore)
     }
 
     @Provides

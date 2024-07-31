@@ -9,5 +9,6 @@ sealed class AppRouter(val route : String) {
     object HomeScreen: AppRouter(route = "home")
     object Dictionary: AppRouter(route = "dictionary")
 
+    object Lessons: AppRouter(route = "lessons")
     object ProfileScreen : AppRouter(route = "profile")
 }

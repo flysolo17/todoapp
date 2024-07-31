@@ -23,4 +23,8 @@ interface AuthRepository {
         password: String,
         result : (UiState<Users>) -> Unit
     )
+
+    fun logout(
+        result: (UiState<String>) -> Unit
+    )
 }
