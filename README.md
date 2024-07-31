@@ -39,7 +39,3 @@ Before you begin, ensure you have the following installed:
    ```bash
    ng serve
    ```
-
-```
-
-```
