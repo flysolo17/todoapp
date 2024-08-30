@@ -1,5 +1,7 @@
 package com.ketchupzzz.isaom.repository.translator
 
+import android.content.Context
+import android.net.Uri
 import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.services.TranslationResponse
 
@@ -9,5 +11,11 @@ interface TranslatorRepository {
           source : String,
           target : String,
           result : (UiState<TranslationResponse>) -> Unit
+     )
+     fun translateImage(
+          context : Context,
+         uri : Uri,
+          source: String,
+          target: String
      )
 }

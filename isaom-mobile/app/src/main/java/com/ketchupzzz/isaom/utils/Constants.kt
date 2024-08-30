@@ -1,5 +1,10 @@
 package com.ketchupzzz.isaom.utils
 
+import android.content.Context
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+
 public  fun generateRandomString(length: Int = 15): String {
     val characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
     var result = ""
@@ -16,4 +21,17 @@ public  fun generateRandomString(length: Int = 15): String {
 fun Int.indexToLetter(): Char {
     require(this >= 0) { "Index must be non-negative" }
     return ('A' + this)
+}
+
+
+fun Context.createImageFile(): File {
+    val timeStamp = SimpleDateFormat("yyyy_MM_dd_HH:mm:ss").format(Date())
+    val imageFileName = "JPEG_" + timeStamp + "_"
+    val image = File.createTempFile(
+        imageFileName,
+        ".jpg",
+        externalCacheDir
+    )
+
+    return image
 }

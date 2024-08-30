@@ -1,5 +1,7 @@
 package com.ketchupzzz.isaom.presentation.main.home
 
+import android.content.Context
+import android.net.Uri
 import com.ketchupzzz.isaom.models.SourceAndTargets
 
 sealed interface HomeEvents {
@@ -9,4 +11,6 @@ sealed interface HomeEvents {
     data class OnSourceChanged(val source: SourceAndTargets) : HomeEvents
     data class OnTargetChanged(val target: SourceAndTargets) : HomeEvents
     data class OnSwitchLanguage(val source : SourceAndTargets,val target: SourceAndTargets) : HomeEvents
+
+    data class OnTransformImageToText(val context : Context,val uri : Uri) : HomeEvents
 }

@@ -1,5 +1,7 @@
 package com.ketchupzzz.isaom.repository.translator
 
+import android.content.Context
+import android.net.Uri
 import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.services.TranslationResponse
 import com.ketchupzzz.isaom.services.TranslatorService
@@ -41,6 +43,10 @@ class TranslatorRepositoryImpl(private  val translatorService: TranslatorService
                 result(UiState.Error("Network error: ${t.message}"))
             }
         })
+    }
+
+    override fun translateImage(context: Context, uri: Uri, source: String, target: String) {
+        TODO("Not yet implemented")
     }
 
 }
