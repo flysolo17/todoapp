@@ -2,7 +2,6 @@
 
 ## Description
 
-//todo
 
 ## Angular Project
 
@@ -28,7 +27,7 @@ Before you begin, ensure you have the following installed:
     cd isaom/isaom-web
    ```
 
-3. **Install dependencies**
+3. **Install dependencies wait untill finish downloading**
 
    ```bash
    npm install
@@ -39,3 +38,17 @@ Before you begin, ensure you have the following installed:
    ```bash
    ng serve
    ```
+
+## How to run the android app 
+
+
+1. **Open Android Studio**
+2. **Click Flie > Open**
+3. **Find The Folder isaom/isaom-mobile**
+4. **Download dependencies(This takes long time for the first time)**
+5. **Connect your phone via usb(enable usb debugging on your settings)**
+6. **Click run button**
+ 
+
+
+   
