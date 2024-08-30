@@ -1,6 +1,8 @@
 package com.ketchupzzz.isaom.presentation.main.bottombar
 
 import androidx.annotation.DrawableRes
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Folder
 import com.ketchupzzz.isaom.R
 import com.ketchupzzz.isaom.presentation.routes.AppRouter
 
@@ -13,9 +15,34 @@ data class BottomNavigationItems(
     val route : String
 ) {
     companion object {
-        val ITEMS : List<BottomNavigationItems> = listOf(
+
+        val TEACHER_ITEMS : List<BottomNavigationItems> = listOf(
             BottomNavigationItems(
                 label = "Dashboard",
+                selectedIcon = R.drawable.home_filled,
+                unselectedIcon = R.drawable.home_outlined,
+                hasNews = false,
+                route = AppRouter.TeacherDashboard.route
+            ),
+            BottomNavigationItems(
+                label = "Submissions",
+                selectedIcon = R.drawable.file_text,
+                unselectedIcon = R.drawable.file_text_filled,
+                hasNews = false,
+                route = AppRouter.TeacherSubmissions.route
+            ),
+            BottomNavigationItems(
+                label = "Profile",
+                selectedIcon = R.drawable.user_filled,
+                unselectedIcon = R.drawable.user_outlined,
+                hasNews = false,
+                route = AppRouter.ProfileScreen.route
+            )
+        )
+
+        val ITEMS : List<BottomNavigationItems> = listOf(
+            BottomNavigationItems(
+                label = "Home",
                 selectedIcon = R.drawable.home_filled,
                 unselectedIcon = R.drawable.home_outlined,
                 hasNews = false,

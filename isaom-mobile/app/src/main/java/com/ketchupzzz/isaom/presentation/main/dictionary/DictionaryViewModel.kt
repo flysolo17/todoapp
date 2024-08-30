@@ -1,12 +1,11 @@
 package com.ketchupzzz.isaom.presentation.main.dictionary
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ketchupzzz.analytical.utils.UiState
+import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.models.Dictionary
 import com.ketchupzzz.isaom.repository.dictionary.DictionaryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

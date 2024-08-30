@@ -46,8 +46,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.packInts
 import androidx.navigation.NavHostController
 import com.ketchupzzz.isaom.R
+import com.ketchupzzz.isaom.models.UserType
 import com.ketchupzzz.isaom.presentation.routes.AppRouter
 import com.ketchupzzz.isaom.ui.custom.PrimaryButton
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier,
@@ -58,7 +60,13 @@ fun LoginScreen(modifier: Modifier = Modifier,
     LaunchedEffect(state) {
         if (state.isLoggedIn) {
             Toast.makeText(context,"Successfully Logged in",Toast.LENGTH_SHORT).show()
-            navHostController.navigate(AppRouter.MainRoutes.route)
+            delay(1000)
+            if (state.users?.type === UserType.TEACHER) {
+                navHostController.navigate(AppRouter.TeacherRoutes.route)
+            } else {
+                navHostController.navigate(AppRouter.MainRoutes.route)
+            }
+
         }
         if (state.error !== null) {
             Toast.makeText(context,state.error,Toast.LENGTH_SHORT).show()
@@ -161,7 +169,7 @@ fun LoginForm(modifier: Modifier = Modifier, navHostController: NavHostControlle
                 )
             
             TextButton(onClick = {
-
+                navHostController.navigate(AppRouter.ForgotPasswordScreen.route)
             },modifier = modifier.align(Alignment.End)) {
                 Text(text = "Forgot Password")
             }

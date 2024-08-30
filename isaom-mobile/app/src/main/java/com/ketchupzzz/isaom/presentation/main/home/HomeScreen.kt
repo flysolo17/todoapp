@@ -1,15 +1,25 @@
 package com.ketchupzzz.isaom.presentation.main.home
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SwitchRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,100 +45,155 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ketchupzzz.isaom.R
+import com.ketchupzzz.isaom.models.SourceAndTargets
+import com.ketchupzzz.isaom.presentation.main.translator.TranslatorEvents
+import com.ketchupzzz.isaom.presentation.main.translator.TranslatorState
+import com.ketchupzzz.isaom.presentation.routes.AppRouter
+import com.ketchupzzz.isaom.ui.custom.IsaomDropdownMenu
 import com.ketchupzzz.isaom.ui.custom.PrimaryButton
+import com.ketchupzzz.isaom.ui.custom.SubjectCard
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, navHostController: NavHostController,state: HomeState,events: (HomeEvents) -> Unit) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController,
+    state: HomeState,
+    events: (HomeEvents) -> Unit
+) {
     val context = LocalContext.current
     LaunchedEffect(state) {
-        if (state.error != null) {
-            Toast.makeText(context,state.error,Toast.LENGTH_SHORT).show()
+        if (state.users != null) {
+            events(HomeEvents.OnGetSubjects(state.users.sectionID?:""))
         }
     }
-    Column(modifier = modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize()
+    ) {
+        item {
+            TranslatorLayout(state = state, events = events)
+        }
+        item{
+            SubjectLayout(state = state, navHostController = navHostController)
+        }
+    }
+}
+
+@Composable
+fun TranslatorLayout(
+    modifier: Modifier = Modifier,
+    state: HomeState,
+    events: (HomeEvents) -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp)
+
+    ) {
+        Text(text = "Translate Text")
+        Spacer(modifier = modifier.height(8.dp))
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .clickable { },
+            modifier = modifier.fillMaxWidth()
         ) {
-            Row(
-                modifier =  modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = "English", style = MaterialTheme.typography.titleMedium, modifier = modifier.weight(1f))
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(painter = painterResource(id = R.drawable.baseline_swap_horiz_24), contentDescription = "Swap")
+                Row(
+                    modifier = modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    IsaomDropdownMenu(
+                        modifier = modifier.weight(1f),
+                        selectedValue = state.source
+                    ) {
+                        events.invoke(HomeEvents.OnSourceChanged(it))
+                    }
+                    IconButton(onClick = {
+                        events.invoke(
+                            HomeEvents.OnSwitchLanguage(
+                                state.source,
+                                state.target
+                            ))
+                    }) {
+                        Icon(imageVector = Icons.Default.SwitchRight, contentDescription = "Switch")
+                    }
+                    IsaomDropdownMenu(
+                        modifier = modifier.weight(1f),
+                        selectedValue = state.target
+                    ) {
+                        events.invoke(HomeEvents.OnTargetChanged(it))
+                    }
                 }
-                Text(text = "Ilocano",
-                    textAlign = TextAlign.End,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = modifier.weight(1f))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val textFielfColors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent
+                    )
+                    TextField(
+                        value = state.text,
+                        onValueChange = {events.invoke(HomeEvents.OnTextChanged(it))},
+                        modifier = modifier.weight(1f),
+                        label = { Text("Enter text") },
+                        minLines = 3,
+                        colors = textFielfColors
+                    )
+                    TextField(
+                        value = state.translation ?: "",
+                        readOnly = true,
+                        onValueChange = {},
+                        label = { Text("Translation") },
+                        minLines = 3,
+                        modifier = modifier.weight(1f),
+                        colors = textFielfColors
+                    )
+                }
+                PrimaryButton(
+                    modifier  = modifier.padding(8.dp),
+                    isLoading = state.isTranslating,
+                    onClick = {
+                        events.invoke(HomeEvents.OnTranslateText(state.text,state.source,state.target))
+                    }
+                ) {
+                    Text(text = "Translate")
+                }
+
             }
         }
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .clickable { },
-        ) {
-            Column(modifier = modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "English",modifier = modifier.weight(1f))
+    }
+}
 
+
+
+@Composable
+fun SubjectLayout(
+    modifier: Modifier = Modifier,
+    state: HomeState,
+    navHostController: NavHostController
+) {
+    Column(
+        modifier = modifier
+            .wrapContentSize()
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "Subjects",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        state.subjects.forEach {subject->
+            SubjectCard(subject = subject,
+                onClick = {
+                    navHostController.navigate(AppRouter.StudentViewSubject.createRoute(subject))
                 }
-
-                    HorizontalDivider()
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "Ilocano",modifier = modifier.weight(1f))
-
-                    }
-
-                    Text(text = state.translation ?:" not yet")
-
-                TextField(
-                    value = state.text,
-                    onValueChange = { it ->
-                        events(HomeEvents.OnTextChanged(it))
-                    },
-                    modifier = modifier
-                        .fillMaxWidth(),
-                    label = { Text("Enter text here..") },
-                    maxLines = 2,
-                    minLines = 2,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Default
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-
-                        }
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        disabledIndicatorColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    )
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment =Alignment.CenterVertically) {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(painter = painterResource(id = R.drawable.baseline_add_a_photo_24), contentDescription = "Add Image")
-                    }
-                    PrimaryButton(
-                        isLoading = state.isLoading,
-                        onClick = {
-                        if (state.text.isEmpty()) {
-                            Toast.makeText(context,"Add a text",Toast.LENGTH_SHORT).show()
-                            return@PrimaryButton
-                        }
-                        events(HomeEvents.OnTranslateText(state.text))
-                    }) {
-                        Text(text = "Translate")
-                    }
-                }
-            }
-            
+            )
         }
     }
 }

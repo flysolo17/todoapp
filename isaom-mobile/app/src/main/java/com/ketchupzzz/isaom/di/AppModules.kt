@@ -5,14 +5,20 @@ import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.ketchupzzz.isaom.repository.activity.ActivityRepository
+import com.ketchupzzz.isaom.repository.activity.ActivityRepositoryImpl
 import com.ketchupzzz.isaom.repository.dictionary.DictionaryRepository
 import com.ketchupzzz.isaom.repository.dictionary.DictionaryRepositoryImpl
 import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.repository.auth.AuthRepositoryImpl
 import com.ketchupzzz.isaom.repository.lessons.LessonRepository
 import com.ketchupzzz.isaom.repository.lessons.LessonRepositoryImpl
+import com.ketchupzzz.isaom.repository.modules.ModuleRepository
+import com.ketchupzzz.isaom.repository.modules.ModuleRepositoryImpl
 import com.ketchupzzz.isaom.repository.sections.SectionRepository
 import com.ketchupzzz.isaom.repository.sections.SectionRepositoryImpl
+import com.ketchupzzz.isaom.repository.subject.SubjectRepository
+import com.ketchupzzz.isaom.repository.subject.SubjectRepositoryImpl
 import com.ketchupzzz.isaom.repository.translator.TranslatorRepository
 import com.ketchupzzz.isaom.repository.translator.TranslatorRepositoryImpl
 import com.ketchupzzz.isaom.services.TranslatorService
@@ -103,4 +109,23 @@ object AppModule {
     fun provideTranslatorRepository(translatorService: TranslatorService) :TranslatorRepository {
        return TranslatorRepositoryImpl(translatorService)
     }
- }
+
+    @Provides
+    @Singleton
+    fun provideSubjectRepository(firestore: FirebaseFirestore,storage: FirebaseStorage) : SubjectRepository {
+        return SubjectRepositoryImpl(firestore,storage)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideModuleRepository(firestore: FirebaseFirestore,storage: FirebaseStorage) : ModuleRepository {
+        return ModuleRepositoryImpl(firestore,storage)
+    }
+
+    @Provides
+    @Singleton
+    fun provideActivityRepository(firestore: FirebaseFirestore,storage: FirebaseStorage) : ActivityRepository {
+        return ActivityRepositoryImpl(firestore,storage)
+    }
+  }

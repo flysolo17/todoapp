@@ -108,6 +108,18 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation ("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+
+
+
+    //rich text editor
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc06")
+
+
+    implementation("androidx.compose.material:material-icons-extended:1.5.3")
+
+
+
+    implementation("de.charlex.compose.material3:material3-html-text:2.0.0-beta01")
 }
 
 

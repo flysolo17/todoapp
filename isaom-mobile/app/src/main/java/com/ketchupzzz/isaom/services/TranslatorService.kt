@@ -9,16 +9,17 @@ import retrofit2.http.Query
 interface TranslatorService {
 
 
-    @GET("/translate")
+    @GET("translate")
      fun translateText(
-        @Query("text") text: String
+        @Query("text") text: String,
+        @Query("source") source: String,
+        @Query("target") target: String
     ): Call<TranslationResponse>
     companion object {
-        const val API = "http://192.168.100.18:3000/"
+        const val API = "https://walrus-app-sbyty.ondigitalocean.app/translation/"
     }
 }
 
 data class TranslationResponse(
-    val translatedText: String
-    // Define other fields if necessary based on the API response
+    val translation_text: String
 )

@@ -1,11 +1,17 @@
 package com.ketchupzzz.isaom.presentation.main.bottombar
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,16 +26,26 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun BottomNavBar(navController: NavController) {
-    val navigationItems : List<BottomNavigationItems> = BottomNavigationItems.ITEMS
+fun BottomNavBar(
+    navController: NavController ,
+    items: List<BottomNavigationItems>
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
-    val bottomBarDestination = navigationItems.any { it.route == currentRoute?.route }
-    BottomAppBar(containerColor = Color.Transparent) {
-        navigationItems.forEachIndexed { index, destinations ->
+    val bottomBarDestination = items.any { it.route == currentRoute?.route }
+    BottomAppBar(containerColor = MaterialTheme.colorScheme.surface) {
+        items.forEachIndexed { index, destinations ->
             val isSelected = currentRoute?.hierarchy?.any {
                 it.route == destinations.route
             } == true
+            if (index == 2) {
+                FloatingActionButton(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Camera, contentDescription = "Camera")
+                }
+            }
             NavigationBarItem(selected = isSelected,
                 onClick = {
                     navController.navigate(destinations.route) {

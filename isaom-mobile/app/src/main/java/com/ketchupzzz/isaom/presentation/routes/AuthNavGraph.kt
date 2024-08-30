@@ -5,11 +5,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.ketchupzzz.isaom.presentation.auth.forgot.ForgotPasswordScreen
+import com.ketchupzzz.isaom.models.GenderSelection
+import com.ketchupzzz.isaom.presentation.auth.forgotPassword.ForgotPasswordScreen
+import com.ketchupzzz.isaom.presentation.auth.forgotPassword.ForgotPasswordViewModel
 import com.ketchupzzz.isaom.presentation.auth.login.LoginScreen
 import com.ketchupzzz.isaom.presentation.auth.login.LoginViewModel
 import com.ketchupzzz.isaom.presentation.auth.register.RegisterScreen
 import com.ketchupzzz.isaom.presentation.auth.register.RegisterViewModel
+import com.ketchupzzz.isaom.presentation.auth.register.gender.GenderScreen
 
 fun NavGraphBuilder.authNavGraph(navHostController: NavHostController) {
     navigation(startDestination = AppRouter.LoginScreen.route,route = AppRouter.AuthRoutes.route) {
@@ -25,8 +28,15 @@ fun NavGraphBuilder.authNavGraph(navHostController: NavHostController) {
             val events = viewmodel::onEvent
             RegisterScreen(navHostController = navHostController, state = state, events = events)
         }
+
+
         composable(route = AppRouter.ForgotPasswordScreen.route) {
-            ForgotPasswordScreen()
+            val viewModel = hiltViewModel<ForgotPasswordViewModel>()
+            ForgotPasswordScreen(
+                state = viewModel.state,
+                events = viewModel::events,
+                navHostController = navHostController
+            )
         }
     }
 }

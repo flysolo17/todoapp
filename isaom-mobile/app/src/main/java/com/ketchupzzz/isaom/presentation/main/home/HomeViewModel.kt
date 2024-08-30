@@ -5,7 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ketchupzzz.analytical.utils.UiState
+import com.ketchupzzz.isaom.models.SourceAndTargets
+import com.ketchupzzz.isaom.utils.UiState
+import com.ketchupzzz.isaom.repository.auth.AuthRepository
+import com.ketchupzzz.isaom.repository.subject.SubjectRepository
 import com.ketchupzzz.isaom.repository.translator.TranslatorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,10 +18,16 @@ import javax.inject.Inject
 @HiltViewModel
 
 class HomeViewModel @Inject constructor(
-     private val translatorRepository: TranslatorRepository
+     private val authRepository: AuthRepository,
+     private val translatorRepository: TranslatorRepository,
+     private val subjectRepository: SubjectRepository
 ) : ViewModel() {
     var state by mutableStateOf(HomeState())
-
+     init {
+          state = state.copy(
+               users = authRepository.getUsers()
+          )
+     }
      fun events(events: HomeEvents) {
           when(events) {
                is HomeEvents.OnTextChanged -> {
@@ -26,30 +35,62 @@ class HomeViewModel @Inject constructor(
                          text = events.text
                     )
                }
-               is HomeEvents.OnTranslateText -> translateText(events.text)
+               is HomeEvents.OnTranslateText -> translateText(events.text,events.source,events.target)
+               is HomeEvents.OnGetSubjects -> getSubjects(events.sectionID)
+              is HomeEvents.OnSourceChanged -> state = state.copy(
+                  source = events.source
+              )
+              is HomeEvents.OnTargetChanged -> state = state.copy(
+                  target = events.target
+              )
+
+              is HomeEvents.OnSwitchLanguage -> state = state.copy(
+                  source = events.target,
+                  target = events.source,
+              )
+          }
+     }
+
+     private fun getSubjects(sectionID: String) {
+          viewModelScope.launch {
+               subjectRepository.getSubjectBySectionID(sectionID) {
+                   state =  when(it) {
+                         is UiState.Error -> state.copy(
+                              isLoading = false,
+                              error = it.message
+                         )
+                         is UiState.Loading -> state.copy(
+                              isLoading = true,
+                              error = null,
+                         )
+                         is UiState.Success -> state.copy(
+                              isLoading = false,
+                              error = null,
+                              subjects = it.data
+                         )
+                    }
+               }
           }
      }
 
 
-     private fun translateText(text : String) {
+     private fun translateText(text: String, source: SourceAndTargets, target: SourceAndTargets) {
           viewModelScope.launch {
-               translatorRepository.translateText(text) { uiState ->
+               translatorRepository.translateText(text,source.code,target.code) { uiState ->
                     state = when (uiState) {
-                         is UiState.Loading -> {
-                              state.copy(isLoading = true, error = null)
-                         }
-
-                         is UiState.Success -> {
-                              state.copy(
-                                   isLoading = false,
-                                   translation = uiState.data.translatedText,
-                                   error = null
-                              )
-                         }
-
+                        is UiState.Loading -> {
+                            state.copy(isTranslating = true, error = null, translation = "Loading..")
+                        }
                          is UiState.Error -> {
-                              state.copy(isLoading = false, error = uiState.message)
+                              state.copy(isTranslating = false, error = uiState.message, translation = uiState.message)
                          }
+                        is UiState.Success -> {
+                            state.copy(
+                                isTranslating = false,
+                                translation = uiState.data.translation_text,
+                                error = null
+                            )
+                        }
                     }
                }
           }

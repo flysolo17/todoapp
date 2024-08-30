@@ -11,3 +11,9 @@ public  fun generateRandomString(length: Int = 15): String {
 
     return result
 }
+
+
+fun Int.indexToLetter(): Char {
+    require(this >= 0) { "Index must be non-negative" }
+    return ('A' + this)
+}

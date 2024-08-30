@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PrimaryButton(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     enabled: Boolean = true,
     isLoading: Boolean = false,
@@ -27,7 +28,7 @@ fun PrimaryButton(
 ) {
     Button(onClick = onClick,
         enabled = enabled,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(50.dp),
         shape = RoundedCornerShape(10.dp),
@@ -38,7 +39,7 @@ fun PrimaryButton(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp),color = Color.White)
+                CircularProgressIndicator(modifier = modifier.size(24.dp),color = Color.White)
                 Text(text = "Loading", fontWeight = FontWeight.Bold,color = Color.White)
             }
         } else {

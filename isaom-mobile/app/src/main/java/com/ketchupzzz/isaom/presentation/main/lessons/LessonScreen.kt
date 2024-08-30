@@ -25,6 +25,7 @@ import com.ketchupzzz.isaom.models.SignLanguageLesson
 import com.ketchupzzz.isaom.utils.generateRandomString
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 
@@ -38,7 +39,7 @@ fun LessonScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     Column(modifier = modifier
         .fillMaxSize()
-        .padding(16.dp)) {
+        .padding(8.dp)) {
         LazyColumn {
             items(state.lessons, key = {it.id ?: generateRandomString() }) {
                 LessonCard(lesson = it, lifecycleOwner = lifecycleOwner)
@@ -50,8 +51,9 @@ fun LessonScreen(
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun LessonCard(modifier: Modifier =Modifier,lesson: SignLanguageLesson,lifecycleOwner: LifecycleOwner) {
-
-    Card(modifier = modifier.fillMaxWidth().padding(3.dp)) {
+    Card(modifier = modifier
+        .fillMaxWidth()
+        .padding(3.dp)) {
         Column {
             AndroidView(
                 modifier = Modifier
@@ -59,14 +61,13 @@ fun LessonCard(modifier: Modifier =Modifier,lesson: SignLanguageLesson,lifecycle
                     .height(200.dp), // Adjust height as needed
                 factory = { ctx ->
                     YouTubePlayerView(ctx).apply {
-
                         lifecycleOwner.lifecycle.addObserver(this)
                         addYouTubePlayerListener(
                             object  : AbstractYouTubePlayerListener() {
                                 override fun onReady(youTubePlayer: YouTubePlayer) {
                                     youTubePlayer.loadVideo(lesson.videoId!!,0f)
+                                    youTubePlayer.pause()
                                     super.onReady(youTubePlayer)
-
                                 }
                             }
                         )

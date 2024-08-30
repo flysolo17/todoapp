@@ -6,4 +6,6 @@ sealed interface LoginEvents {
     data object OnTogglePasswordVisibility : LoginEvents
     data object OnLogin : LoginEvents
 
+    data object OnGetCurrentUser : LoginEvents
+
 }

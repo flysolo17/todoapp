@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.ketchupzzz.analytical.utils.UiState
+import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.utils.hasSpaces
 import com.ketchupzzz.isaom.utils.isLessThanSix
@@ -18,6 +18,9 @@ class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
     var state by mutableStateOf(LoginState())
+    init {
+        onEvent(LoginEvents.OnGetCurrentUser)
+    }
     fun onEvent(events: LoginEvents) {
         when(events) {
             is LoginEvents.OnLogin -> login()
@@ -29,6 +32,24 @@ class LoginViewModel @Inject constructor(
                 )
             }
 
+            LoginEvents.OnGetCurrentUser -> getCurrentUser()
+        }
+    }
+
+    private fun getCurrentUser() {
+        authRepository.getCurrentUser  {
+            state = when(it) {
+                is UiState.Error -> {
+                    state.copy(isLoading = false, error = it.message)
+                }
+                is UiState.Loading -> {
+                    state.copy(isLoading = true, error = null)
+                }
+                is UiState.Success -> {
+                    authRepository.setUser(it.data)
+                    state.copy(isLoading = false, isLoggedIn = true, error = null, users = it.data)
+                }
+            }
         }
     }
 
@@ -58,7 +79,7 @@ class LoginViewModel @Inject constructor(
                 }
                 is UiState.Success -> {
                     authRepository.setUser(it.data)
-                    state.copy(isLoading = false, isLoggedIn = true, error = null)
+                    state.copy(isLoading = false, isLoggedIn = true, error = null, users = it.data)
                 }
             }
         }

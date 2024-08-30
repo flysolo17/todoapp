@@ -1,17 +1,9 @@
 package com.ketchupzzz.isaom.repository.dictionary
 
-import android.util.JsonReader
-import android.util.Log
-import androidx.annotation.WorkerThread
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.WriteBatch
-import com.ketchupzzz.analytical.utils.UiState
+import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.models.Dictionary
-import com.ketchupzzz.isaom.utils.generateRandomString
-import org.json.JSONArray
-import org.json.JSONObject
 
-import java.io.BufferedReader
 const val DICTIONARY_COLLECTION  = "dictionary";
 class DictionaryRepositoryImpl(private val firestore: FirebaseFirestore) : DictionaryRepository {
 

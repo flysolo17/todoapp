@@ -1,6 +1,7 @@
 package com.ketchupzzz.isaom.presentation.auth.register
 
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,10 +10,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -24,12 +30,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,11 +54,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ketchupzzz.isaom.R
 import com.ketchupzzz.isaom.models.Gender
+import com.ketchupzzz.isaom.models.UserType
 import com.ketchupzzz.isaom.presentation.auth.login.LoginEvents
+import com.ketchupzzz.isaom.presentation.auth.register.account.AccountTypeScreen
+import com.ketchupzzz.isaom.presentation.auth.register.gender.GenderScreen
 import com.ketchupzzz.isaom.presentation.routes.AppRouter
 import com.ketchupzzz.isaom.ui.custom.PrimaryButton
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.reflect.KFunction1
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RegisterScreen(
     modifier: Modifier =Modifier,
@@ -58,36 +73,123 @@ fun RegisterScreen(
     events: (RegisterEvents) -> Unit
 ) {
     val context = LocalContext.current
+    val onBoardingState = rememberPagerState(0,0F) {
+        3
+    }
+
+    val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(state) {
         if (state.registerSuccess) {
             Toast.makeText(context,"Successfully Created",Toast.LENGTH_SHORT).show()
-            navHostController.navigate(AppRouter.MainRoutes.route)
+            delay(1000L)
+            navHostController.popBackStack()
         }
         if (state.errors !== null) {
             Toast.makeText(context,state.errors,Toast.LENGTH_SHORT).show()
         }
+
     }
-    Scaffold {
-        Column(modifier = modifier
-            .fillMaxSize()
-            .padding(it)
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Register", style = MaterialTheme.typography.titleLarge)
-            Text(text = "Create you ISAOM account", style = MaterialTheme.typography.labelMedium)
-            Spacer(modifier = modifier.weight(1f))
-            RegisterForm(state = state, events = events)
-            Spacer(modifier = modifier.weight(1f))
-            TextButton(onClick = { navHostController.popBackStack() }) {
-                Text(text = "Already have an account? Sign in here")
+    Scaffold(
+        topBar = { RegisterAppBar(
+            state = onBoardingState,
+            events = events,
+            navHostController = navHostController
+        )}
+    ) {
+        HorizontalPager(state = onBoardingState,modifier = modifier.fillMaxSize().padding(it), userScrollEnabled = false) {page->
+            when(page) {
+                0 -> AccountTypeScreen() {
+                    events(RegisterEvents.OnUserTypeSelected(it))
+                    coroutineScope.launch {
+                        onBoardingState.animateScrollToPage(onBoardingState.currentPage + 1)
+                    }
+                }
+                1 -> GenderScreen(state = state, onSelected = { gender ,url ->
+                    events(RegisterEvents.OnSelectGender(gender, url))
+                    coroutineScope.launch {
+                        onBoardingState.animateScrollToPage(onBoardingState.currentPage + 1)
+                    }
+                })
+                2 -> RegisterLast(state = state, events = events, navHostController = navHostController)
+                else -> AccountTypeScreen {
+                    events(RegisterEvents.OnUserTypeSelected(it))
+                    coroutineScope.launch {
+                        onBoardingState.animateScrollToPage(onBoardingState.currentPage + 1)
+                    }
+                }
             }
         }
+   }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+fun RegisterAppBar(
+    state : PagerState,
+    events: (RegisterEvents) -> Unit,
+    navHostController: NavHostController
+) {
+    fun appBarTitle(state: PagerState) : String{
+        return  when(state.currentPage) {
+            0 -> "Select Account Type"
+            1 -> "Select Gender"
+            2-> "Registration Form"
+            else -> "Select Account Type"
+        }
     }
+    TopAppBar(
+        title = {
+            Text(
+                text = appBarTitle(state),
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        navigationIcon = {
+            IconButton(onClick = {
+                events(RegisterEvents.OnSelectGender(null, null))
+                navHostController.popBackStack()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+
+        }
+    )
+
 }
 
 
+@Composable
+fun RegisterLast(
+    modifier: Modifier = Modifier,
+    state: RegisterState,
+    events: (RegisterEvents) -> Unit,
+    navHostController: NavHostController
+) {
+    Column(modifier = modifier
+        .fillMaxSize()
+        .padding(16.dp)
+        .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Register", style = MaterialTheme.typography.titleLarge)
+        Text(text = "Create you ISAOM account", style = MaterialTheme.typography.labelMedium)
+        Spacer(modifier = modifier.weight(1f))
+        RegisterForm(state = state, events = events)
+        Spacer(modifier = modifier.weight(1f))
+        TextButton(onClick = { navHostController.popBackStack() }) {
+            Text(text = "Already have an account? Sign in here")
+        }
+    }
+
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterForm(modifier: Modifier = Modifier,state: RegisterState,events: (RegisterEvents) -> Unit) {
@@ -141,97 +243,55 @@ fun RegisterForm(modifier: Modifier = Modifier,state: RegisterState,events: (Reg
 
 
 
-        val genders = Gender.entries.toTypedArray()
-        var expanded by remember { mutableStateOf(false) }
-
-        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange =  {
-            expanded = !expanded
-        }) {
-            OutlinedTextField(
-                readOnly = true,
-                value = state.gender.name,
-                onValueChange = { events(RegisterEvents.OnGenderChange(state.gender)) },
-                label = { Text("Gender") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(),
-                supportingText = {
-                    Text(
-                        text =  "",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.labelSmall,
-                        textAlign = TextAlign.Start
-                    )
-                },
-
-            )
 
 
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.exposedDropdownSize()
-            ) {
-                genders.forEach { gender ->
-                    DropdownMenuItem(
-                        text = { Text(gender.name) },
-                        onClick = {
-                            events(RegisterEvents.OnGenderChange(gender))
-                            expanded = false
-                        }
-                    )
+
+
+
+        if (state.userType == UserType.STUDENT) {
+            val sections = state.sectionList
+            var sectionExpanded by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(expanded = sectionExpanded, onExpandedChange =  {
+                sectionExpanded = !sectionExpanded
+            }) {
+                OutlinedTextField(
+                    readOnly = true,
+                    value = state.section?.name ?: "No Section Selected",
+                    onValueChange = { events(RegisterEvents.OnSectionChange(state.section)) },
+                    label = { Text("Select Section") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sectionExpanded) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    isError = state.section == null,
+                    supportingText = {
+                        Text(
+                            text = if( state.section == null ) "No section selected" else "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.labelSmall,
+                            textAlign = TextAlign.Start
+                        )
+                    },
+                )
+
+                ExposedDropdownMenu(
+                    expanded = sectionExpanded,
+                    onDismissRequest = { sectionExpanded = false },
+                    modifier = Modifier.exposedDropdownSize()
+                ) {
+                    sections.forEach { section ->
+                        DropdownMenuItem(
+                            text = { Text(section.name?: "no section") },
+                            onClick = {
+                                events(RegisterEvents.OnSectionChange(section))
+                                sectionExpanded = false
+                            }
+                        )
+                    }
                 }
             }
         }
 
-
-
-
-        //sections
-
-        val sections = state.sectionList
-        var sectionExpanded by remember { mutableStateOf(false) }
-
-        ExposedDropdownMenuBox(expanded = sectionExpanded, onExpandedChange =  {
-            sectionExpanded = !sectionExpanded
-        }) {
-            OutlinedTextField(
-                readOnly = true,
-                value = state.section?.name ?: "No Section Selected",
-                onValueChange = { events(RegisterEvents.OnSectionChange(state.section)) },
-                label = { Text("Gender") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sectionExpanded) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(),
-                isError = state.section == null,
-                supportingText = {
-                    Text(
-                        text = if( state.section == null ) "No section selected" else "",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.labelSmall,
-                        textAlign = TextAlign.Start
-                    )
-                },
-            )
-
-            ExposedDropdownMenu(
-                expanded = sectionExpanded,
-                onDismissRequest = { sectionExpanded = false },
-                modifier = Modifier.exposedDropdownSize()
-            ) {
-                sections.forEach { section ->
-                    DropdownMenuItem(
-                        text = { Text(section.name?: "no section") },
-                        onClick = {
-                            events(RegisterEvents.OnSectionChange(section))
-                            sectionExpanded = false
-                        }
-                    )
-                }
-            }
-        }
 
 
         OutlinedTextField(

@@ -1,7 +1,6 @@
 package com.ketchupzzz.isaom.repository.dictionary
 
-import android.content.Context
-import com.ketchupzzz.analytical.utils.UiState
+import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.models.Dictionary
 
 interface DictionaryRepository {

@@ -13,11 +13,10 @@ data class Users(
 enum class UserType {
     STUDENT,
     TEACHER,
-    VISITOR
+    GUEST
 }
 
 enum class Gender {
     MALE,
     FEMALE ,
-    NON_BINARY
 }

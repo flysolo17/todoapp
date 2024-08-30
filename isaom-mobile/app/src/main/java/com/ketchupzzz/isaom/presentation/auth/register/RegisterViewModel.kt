@@ -6,7 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.ketchupzzz.analytical.utils.UiState
+import androidx.lifecycle.viewModelScope
+import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.models.Gender
 import com.ketchupzzz.isaom.models.Sections
 import com.ketchupzzz.isaom.models.UserType
@@ -17,6 +18,7 @@ import com.ketchupzzz.isaom.utils.hasNumbers
 import com.ketchupzzz.isaom.utils.hasSpaces
 import com.ketchupzzz.isaom.utils.isLessThanSix
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,13 +29,27 @@ class RegisterViewModel @Inject constructor(
 ) : ViewModel() {
     var state by mutableStateOf(RegisterState())
     init {
+        getAllGenders()
         getAllSections()
+
     }
+
+    private fun getAllGenders() {
+        viewModelScope.launch {
+            authRepository.getAllGenderSelection {
+                if (it is UiState.Success) {
+                    state = state.copy(
+                        genderSelection = it.data
+                    )
+                }
+            }
+        }
+
+    }
+
     fun onEvent(registerEvents: RegisterEvents) {
         when(registerEvents) {
             is RegisterEvents.OnEmailChange -> emailChanged(registerEvents.email)
-            is RegisterEvents.OnGenderChange -> genderChange(registerEvents.gender)
-
             is RegisterEvents.OnNameChange -> nameChanged(registerEvents.name)
             is RegisterEvents.OnPasswordChange -> passwordChanged(registerEvents.password)
             is  RegisterEvents.OnTogglePasswordVisibility -> {
@@ -43,15 +59,30 @@ class RegisterViewModel @Inject constructor(
             }
             is RegisterEvents.OnSectionChange -> sectionChanged(registerEvents.section)
             RegisterEvents.OnCreateAccount -> createAccount()
+            is RegisterEvents.OnSelectGender -> selectGender(registerEvents.gender,registerEvents.url)
+            is RegisterEvents.OnUserTypeSelected -> {
+                state = state.copy(
+                    userType = registerEvents.type
+                )
+            }
         }
     }
+
+    private fun selectGender(gender: Gender?, url: String?) {
+        state = state.copy(
+            selectedGender = gender,
+            selectedGenderUrl = url
+        )
+    }
+
     private fun createAccount() {
         val name : String = state.name.value
         val email : String = state.email.value
         val password : String = state.password.value
-        val gender : Gender  = state.gender
+
+        val gender : Gender  = state.selectedGender?: Gender.MALE
         val section : String = state.section?.id ?: ""
-        if (section == "") {
+        if (section == "" && state.userType === UserType.STUDENT) {
             return
         }
         authRepository.register(
@@ -59,8 +90,9 @@ class RegisterViewModel @Inject constructor(
             email = email,
             password = password,
             gender = gender,
-            type = UserType.STUDENT,
-            sectionID = section
+            type = state.userType ?: UserType.GUEST,
+            sectionID = section,
+            avatar = state.selectedGenderUrl ?:""
         ) {
             when(it) {
                 is UiState.Error -> {
@@ -145,11 +177,7 @@ class RegisterViewModel @Inject constructor(
         )
     }
 
-    private fun genderChange(gender: Gender) {
-        state = state.copy(
-            gender =  gender
-        )
-    }
+
 
     private fun getAllSections() {
         sectionRepository.getAllSections {
