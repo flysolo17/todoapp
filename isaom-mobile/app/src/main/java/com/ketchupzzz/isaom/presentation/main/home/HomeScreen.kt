@@ -7,16 +7,23 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,13 +35,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.SwitchRight
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -47,15 +57,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
@@ -63,6 +77,9 @@ import com.google.android.datatransport.BuildConfig
 import com.google.android.gms.common.internal.Objects
 import com.ketchupzzz.isaom.R
 import com.ketchupzzz.isaom.models.SourceAndTargets
+import com.ketchupzzz.isaom.models.history.History
+import com.ketchupzzz.isaom.models.history.initHistories
+import com.ketchupzzz.isaom.presentation.main.home.components.AboutIlocanoCard
 import com.ketchupzzz.isaom.presentation.main.translator.TranslatorEvents
 import com.ketchupzzz.isaom.presentation.main.translator.TranslatorState
 import com.ketchupzzz.isaom.presentation.routes.AppRouter
@@ -87,121 +104,140 @@ fun HomeScreen(
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
+
         item {
-            TranslatorLayout(state = state, events = events)
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "logo",
+                    modifier = modifier.size(180.dp))
+            }
+
         }
-        item{
-            SubjectLayout(state = state, navHostController = navHostController)
+        item {
+            Spacer(modifier = modifier.height(8.dp))
+        }
+        item {
+
+            FeaturesLayout()
+        }
+        if (state.users != null) {
+            item {
+                SubjectLayout(state = state, navHostController = navHostController)
+            }
+        }
+        item {
+            AboutIlocanoLayout(
+                onLearnMore = { navHostController.navigate(AppRouter.AboutScreen.route) }
+            )
         }
     }
 }
 
+
 @Composable
-fun TranslatorLayout(
+fun AboutIlocanoLayout(
     modifier: Modifier = Modifier,
-    state: HomeState,
-    events: (HomeEvents) -> Unit
+    onLearnMore : () -> Unit
 ) {
     val context = LocalContext.current
+    val histories = context.initHistories()
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-
+            .fillMaxWidth()
+            .wrapContentSize()
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(text = "Translate Text")
-        Spacer(modifier = modifier.height(8.dp))
-        Card(
-            modifier = modifier.fillMaxWidth()
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            Text(text = "About Ilocanos", style = MaterialTheme.typography.titleLarge)
+            TextButton(onClick = onLearnMore) {
+                Text(text = "Learn more")
+            }
+        }
+        AboutIlocanoCard(history = histories[0], onClick = {})
+    }
+}
+
+
+@Composable
+fun FeaturesLayout(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(text = "Features", style = MaterialTheme.typography.titleMedium)
+            Row(
+                modifier = modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                TextButton(
+                    shape = RoundedCornerShape(0.dp),
+                    onClick = { /* Handle click */ },
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .weight(1f)
                 ) {
-
-                    IsaomDropdownMenu(
-                        modifier = modifier.weight(1f),
-                        selectedValue = state.source
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        events.invoke(HomeEvents.OnSourceChanged(it))
-                    }
-                    IconButton(onClick = {
-                        events.invoke(
-                            HomeEvents.OnSwitchLanguage(
-                                state.source,
-                                state.target
-                            ))
-                    }) {
-                        Icon(imageVector = Icons.Default.SwitchRight, contentDescription = "Switch")
-                    }
-                    IsaomDropdownMenu(
-                        modifier = modifier.weight(1f),
-                        selectedValue = state.target
-                    ) {
-                        events.invoke(HomeEvents.OnTargetChanged(it))
-                    }
-                }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    val textFielfColors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
-                    TextField(
-                        value = state.text,
-                        onValueChange = {events.invoke(HomeEvents.OnTextChanged(it))},
-                        modifier = modifier.weight(1f),
-                        label = { Text("Enter text") },
-                        minLines = 3,
-                        colors = textFielfColors
-                    )
-                    TextField(
-                        value = state.translation ?: "",
-                        readOnly = true,
-                        onValueChange = {},
-                        label = { Text("Translation") },
-                        minLines = 3,
-                        modifier = modifier.weight(1f),
-                        colors = textFielfColors
-                    )
-                }
-                Row(
-                    modifier = modifier.padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    CameraButton {
-                        if (it.path?.isNotEmpty() == true) {
-                            events.invoke(HomeEvents.OnTransformImageToText(
-                                context = context, uri = it
-                            ))
-                            return@CameraButton
-                        }
-                    }
-                    PrimaryButton(
-                        modifier  = modifier,
-                        isLoading = state.isTranslating,
-                        onClick = {
-                            events.invoke(HomeEvents.OnTranslateText(state.text,state.source,state.target))
-                        }
-                    ) {
-                        Text(text = "Translate")
+                        Image(
+                            painter = painterResource(id = R.drawable.translator),
+                            contentDescription = "Translator",
+                            contentScale = ContentScale.Fit,
+                            modifier = modifier.size(60.dp)
+                        )
+                        Text(text = "Translator", style = MaterialTheme.typography.titleSmall)
                     }
                 }
 
-
+                TextButton(
+                    shape = RoundedCornerShape(0.dp),
+                    onClick = { /* Handle click */ },
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.la_american_sign_language_interpreting),
+                            contentDescription = "Sign Language",
+                            contentScale = ContentScale.Fit,
+                            modifier = modifier.size(60.dp)
+                        )
+                        Text(text = "Sign Language", style = MaterialTheme.typography.titleSmall)
+                    }
+                }
             }
         }
     }
 }
+
+
+
+
 
 @Composable
 fun CameraButton(
@@ -229,8 +265,8 @@ fun CameraButton(
             Toast.makeText(context,"Permission Denied",Toast.LENGTH_SHORT).show()
         }
     }
-    FilledIconButton(
-        shape = RoundedCornerShape(8.dp),
+    IconButton(
+
         onClick = {
         val cameraPermission =ContextCompat.checkSelfPermission(context,Manifest.permission.CAMERA)
         if (cameraPermission == PackageManager.PERMISSION_GRANTED) {

@@ -106,8 +106,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTranslatorRepository(translatorService: TranslatorService) :TranslatorRepository {
-       return TranslatorRepositoryImpl(translatorService)
+    fun provideTranslatorRepository(translatorService: TranslatorService ,firestore: FirebaseFirestore) :TranslatorRepository {
+       return TranslatorRepositoryImpl(translatorService ,firestore)
     }
 
     @Provides

@@ -18,6 +18,8 @@ sealed class AppRouter(val route : String) {
 
 
 
+    data object TranslatorScreen : AppRouter(route = "translator")
+    data object AboutScreen : AppRouter(route = "about")
     data object MainRoutes : AppRouter(route = "main")
     data object HomeScreen: AppRouter(route = "home")
     data object ChangePassword : AppRouter(route = "change-password")

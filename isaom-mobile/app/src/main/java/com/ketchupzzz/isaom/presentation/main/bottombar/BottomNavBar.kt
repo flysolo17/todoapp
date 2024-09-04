@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ketchupzzz.isaom.presentation.routes.AppRouter
 
 @Composable
 fun BottomNavBar(
@@ -40,7 +41,13 @@ fun BottomNavBar(
             } == true
             if (index == 2) {
                 FloatingActionButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.navigate(AppRouter.TranslatorScreen.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    } },
                     modifier = Modifier.padding(8.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Camera, contentDescription = "Camera")

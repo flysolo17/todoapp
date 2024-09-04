@@ -55,33 +55,11 @@ class HomeViewModel @Inject constructor(
                   target = events.source,
               )
 
-              is HomeEvents.OnTransformImageToText -> transformImageToText(events.context,events.uri)
+
           }
      }
 
-    private fun transformImageToText(context: Context, uri: Uri) {
-        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        val image: InputImage
-        try {
-            image = InputImage.fromFilePath(context, uri)
-            recognizer.process(image)
-                .addOnSuccessListener { visionText ->
-                    state = state.copy(
-                        text = visionText.text
-                    )
-                    events(HomeEvents.OnTranslateText(
-                        state.text,
-                        state.source,
-                        state.target
-                    ))
-                }
-                .addOnFailureListener { e ->
-                    state = state.copy(error = e.message)
-                }
-        } catch (e: IOException) {
-            state = state.copy(error = e.message)
-        }
-    }
+
 
     private fun getSubjects(sectionID: String) {
           viewModelScope.launch {

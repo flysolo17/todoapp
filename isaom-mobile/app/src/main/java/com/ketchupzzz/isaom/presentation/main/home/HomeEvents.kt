@@ -12,5 +12,5 @@ sealed interface HomeEvents {
     data class OnTargetChanged(val target: SourceAndTargets) : HomeEvents
     data class OnSwitchLanguage(val source : SourceAndTargets,val target: SourceAndTargets) : HomeEvents
 
-    data class OnTransformImageToText(val context : Context,val uri : Uri) : HomeEvents
+
 }

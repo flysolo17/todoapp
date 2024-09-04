@@ -11,6 +11,7 @@ import com.ketchupzzz.isaom.models.subject.activities.Activity
 import com.ketchupzzz.isaom.models.subject.module.Modules
 import com.ketchupzzz.isaom.presentation.auth.change_password.ChangePasswordScreen
 import com.ketchupzzz.isaom.presentation.auth.change_password.ChangePasswordViewModel
+import com.ketchupzzz.isaom.presentation.main.about.AboutScreen
 import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryScreen
 import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryViewModel
 import com.ketchupzzz.isaom.presentation.main.home.HomeScreen
@@ -25,6 +26,8 @@ import com.ketchupzzz.isaom.presentation.main.subject.modules.view.StudentViewMo
 import com.ketchupzzz.isaom.presentation.main.subject.modules.view.StudentViewModuleViewModel
 import com.ketchupzzz.isaom.presentation.main.subject.view_subject.StudentViewSubjectScreen
 import com.ketchupzzz.isaom.presentation.main.subject.view_subject.StudentViewSubjectViewModel
+import com.ketchupzzz.isaom.presentation.main.translator.TranslatorScreen
+import com.ketchupzzz.isaom.presentation.main.translator.TranslatorViewModel
 import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.modules.edit_module_content.EditContentScreen
 import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.modules.edit_module_content.EditContentViewModel
 import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.modules.edit_module_content.data.ContentWithModuleID
@@ -40,6 +43,14 @@ fun MainNavGraph(navHostController: NavHostController,mainNav : NavHostControlle
         composable(route = AppRouter.HomeScreen.route) {
             val viewModel = hiltViewModel<HomeViewModel>()
             HomeScreen(navHostController = navHostController, state = viewModel.state, events = viewModel::events)
+        }
+        composable(route = AppRouter.AboutScreen.route) {
+
+            AboutScreen()
+        }
+        composable(route = AppRouter.TranslatorScreen.route) {
+            val viewModel = hiltViewModel<TranslatorViewModel>()
+            TranslatorScreen(state = viewModel.state, events = viewModel::events)
         }
 
         composable(route = AppRouter.StudentViewSubject.route) {

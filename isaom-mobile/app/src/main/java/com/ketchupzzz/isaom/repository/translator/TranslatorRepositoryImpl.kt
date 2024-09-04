@@ -2,12 +2,21 @@ package com.ketchupzzz.isaom.repository.translator
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.toObjects
+import com.ketchupzzz.isaom.models.history.TranslatorHistory
 import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.services.TranslationResponse
 import com.ketchupzzz.isaom.services.TranslatorService
+import kotlinx.coroutines.tasks.await
 import retrofit2.Response
 
-class TranslatorRepositoryImpl(private  val translatorService: TranslatorService): TranslatorRepository {
+class TranslatorRepositoryImpl(
+    private  val translatorService: TranslatorService,
+    private val firestore: FirebaseFirestore
+): TranslatorRepository {
     override fun translateText(
         text: String,
         source : String,
@@ -49,4 +58,55 @@ class TranslatorRepositoryImpl(private  val translatorService: TranslatorService
         TODO("Not yet implemented")
     }
 
+    override suspend fun saveTranslator(
+        translatorHistory: TranslatorHistory,
+    ) {
+        try {
+            if (translatorHistory.userID.isNullOrEmpty()) {
+                return
+            }
+
+            val currentData = firestore
+                .collection(TRANSLATION_COLLECTION)
+                .whereEqualTo("text",translatorHistory.text)
+                .get()
+                .await()
+                .toObjects<TranslatorHistory>()
+            if (currentData.any { it.text?.trim()?.lowercase() == translatorHistory.text?.trim()?.lowercase() }) {
+                return
+            }
+
+            firestore.collection(TRANSLATION_COLLECTION)
+                .document(translatorHistory.id ?: "")
+                .set(translatorHistory)
+                .await()
+
+        } catch (e : Exception) {
+            Log.e(TRANSLATION_COLLECTION,"error",e)
+
+        }
+    }
+
+    override suspend fun getAllTranslationHistory(limit: Int ? ,result: (UiState<List<TranslatorHistory>>) -> Unit) {
+
+        val query = if (limit != null)
+            firestore.collection(TRANSLATION_COLLECTION)
+                .orderBy("createdAt",Query.Direction.DESCENDING)
+                .limit(limit.toLong())
+        else firestore.collection(TRANSLATION_COLLECTION)
+            .orderBy("createdAt",Query.Direction.DESCENDING)
+
+        query.addSnapshotListener { value, error ->
+                error?.let {
+                    result.invoke(UiState.Error(it.localizedMessage ?: "Unknown error"))
+                }
+                value?.let {
+                    result.invoke(UiState.Success(it.toObjects(TranslatorHistory::class.java)))
+                }
+            }
+    }
+
+    companion object {
+        const val TRANSLATION_COLLECTION = "translations"
+    }
 }
