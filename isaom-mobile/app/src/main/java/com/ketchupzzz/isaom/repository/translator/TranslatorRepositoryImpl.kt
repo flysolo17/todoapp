@@ -65,7 +65,6 @@ class TranslatorRepositoryImpl(
             if (translatorHistory.userID.isNullOrEmpty()) {
                 return
             }
-
             val currentData = firestore
                 .collection(TRANSLATION_COLLECTION)
                 .whereEqualTo("text",translatorHistory.text)
@@ -98,6 +97,7 @@ class TranslatorRepositoryImpl(
 
         query.addSnapshotListener { value, error ->
                 error?.let {
+
                     result.invoke(UiState.Error(it.localizedMessage ?: "Unknown error"))
                 }
                 value?.let {

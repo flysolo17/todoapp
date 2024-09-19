@@ -44,7 +44,7 @@ fun ProfileScreen(
     ) {
         ProfileLayout(state = state)
         Spacer(modifier = modifier.weight(1f))
-        PrimaryButton(onClick = { /*TODO*/ }) {
+        PrimaryButton(onClick = { navHostController.navigate(AppRouter.EditProfileRoute.navigate(state.users!!)) }) {
             Text(text = "Edit Profile")
         }
         PrimaryButton(onClick = { navHostController.navigate(AppRouter.ChangePassword.route) }) {

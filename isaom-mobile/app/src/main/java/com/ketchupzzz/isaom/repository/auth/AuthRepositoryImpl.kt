@@ -28,24 +28,18 @@ class AuthRepositoryImpl(val auth : FirebaseAuth, private val firestore: Firebas
        return  _users.value
     }
 
-    override fun getCurrentUser(result: (UiState<Users>) -> Unit) {
+    override fun getCurrentUser(result: (UiState<Users?>) -> Unit) {
         val user = auth.currentUser ?: return
         result.invoke(UiState.Loading)
-        firestore.collection(USERS_COLLECTION).document(user.uid)
-            .get()
-            .addOnCompleteListener { documentResult ->
-                if (documentResult.isSuccessful) {
-                    val users = documentResult.result?.toObject(Users::class.java)
-                    if (users != null) {
-                        result.invoke(UiState.Success(users))
-                    } else {
-                        auth.signOut()
-                        result.invoke(UiState.Error("User data is null"))
-                    }
-                } else {
-                    result.invoke(UiState.Error("Failed to fetch user data"))
+        firestore
+            .collection(USERS_COLLECTION)
+            .document(user.uid)
+            .addSnapshotListener { value, error ->
+                value?.let {
+                    result.invoke(UiState.Success(it.toObject(Users::class.java)))
                 }
             }
+
     }
 
     override fun setUser(users: Users?) {
@@ -214,6 +208,26 @@ class AuthRepositoryImpl(val auth : FirebaseAuth, private val firestore: Firebas
         } catch (e: Exception) {
             result.invoke(UiState.Error(e.message.toString()))
         }
+    }
+
+    override suspend fun updateUserInfo(
+        uid: String,
+        name: String,
+        result: (UiState<String>) -> Unit,
+    ) {
+        result.invoke(UiState.Loading)
+        firestore.collection(USERS_COLLECTION)
+            .document(uid)
+            .update("name",name)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    result.invoke(UiState.Success("Successfully saved!"))
+                } else {
+                    result.invoke(UiState.Error(task.exception?.message ?: "Unknown Error"))
+                }
+            }.addOnFailureListener { exception ->
+                result.invoke(UiState.Error(exception.message ?: "Unknown Error"))
+            }
     }
 
 

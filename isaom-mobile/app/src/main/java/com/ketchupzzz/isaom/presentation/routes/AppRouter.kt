@@ -1,6 +1,7 @@
 package com.ketchupzzz.isaom.presentation.routes
 
 import com.google.gson.Gson
+import com.ketchupzzz.isaom.models.Users
 import com.ketchupzzz.isaom.models.subject.Subjects
 import com.ketchupzzz.isaom.models.subject.activities.Activity
 import com.ketchupzzz.isaom.models.subject.module.Content
@@ -21,6 +22,8 @@ sealed class AppRouter(val route : String) {
     data object TranslatorScreen : AppRouter(route = "translator")
     data object AboutScreen : AppRouter(route = "about")
     data object MainRoutes : AppRouter(route = "main")
+    data object GameRoute : AppRouter(route = "game")
+    data object GamingRoute : AppRouter(route = "gaming")
     data object HomeScreen: AppRouter(route = "home")
     data object ChangePassword : AppRouter(route = "change-password")
 
@@ -31,6 +34,7 @@ sealed class AppRouter(val route : String) {
             return "student-view-subject/$encodedJson"
         }
     }
+
 
     data object StudentViewModule : AppRouter(route = "student-view-module/{args}") {
         fun createRoute(args: Modules) : String {
@@ -54,6 +58,7 @@ sealed class AppRouter(val route : String) {
 
     data object Lessons: AppRouter(route = "lessons")
     object ProfileScreen : AppRouter(route = "profile")
+
 
 
     data object TeacherRoutes : AppRouter(route = "teacher")
@@ -91,6 +96,15 @@ sealed class AppRouter(val route : String) {
     }
 
 
+
     data object TeacherSubmissions : AppRouter(route = "submissions")
 
+
+    data object EditProfileRoute : AppRouter(route = "edit-profile/{args}") {
+        fun navigate(args: Users) : String {
+            val content = Gson().toJson(args)
+            val encodedJson = URLEncoder.encode(content, StandardCharsets.UTF_8.toString())
+            return "edit-profile/$encodedJson"
+        }
+    }
 }

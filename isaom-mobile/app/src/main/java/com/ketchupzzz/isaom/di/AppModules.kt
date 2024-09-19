@@ -11,6 +11,8 @@ import com.ketchupzzz.isaom.repository.dictionary.DictionaryRepository
 import com.ketchupzzz.isaom.repository.dictionary.DictionaryRepositoryImpl
 import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.repository.auth.AuthRepositoryImpl
+import com.ketchupzzz.isaom.repository.game.GameRepository
+import com.ketchupzzz.isaom.repository.game.GameRepositoryImpl
 import com.ketchupzzz.isaom.repository.lessons.LessonRepository
 import com.ketchupzzz.isaom.repository.lessons.LessonRepositoryImpl
 import com.ketchupzzz.isaom.repository.modules.ModuleRepository
@@ -127,5 +129,12 @@ object AppModule {
     @Singleton
     fun provideActivityRepository(firestore: FirebaseFirestore,storage: FirebaseStorage) : ActivityRepository {
         return ActivityRepositoryImpl(firestore,storage)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideGameRepository(@ApplicationContext context: Context,auth: FirebaseAuth,firestore: FirebaseFirestore) : GameRepository {
+        return GameRepositoryImpl(context,auth,firestore)
     }
   }

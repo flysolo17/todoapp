@@ -1,19 +1,29 @@
 package com.ketchupzzz.isaom.presentation.routes
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.google.gson.Gson
+import com.ketchupzzz.isaom.models.Users
 import com.ketchupzzz.isaom.models.subject.Subjects
 import com.ketchupzzz.isaom.models.subject.activities.Activity
 import com.ketchupzzz.isaom.models.subject.module.Modules
 import com.ketchupzzz.isaom.presentation.auth.change_password.ChangePasswordScreen
 import com.ketchupzzz.isaom.presentation.auth.change_password.ChangePasswordViewModel
+import com.ketchupzzz.isaom.presentation.auth.edit_profile.EditProfileScreen
+import com.ketchupzzz.isaom.presentation.auth.edit_profile.EditProfileViewModel
 import com.ketchupzzz.isaom.presentation.main.about.AboutScreen
 import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryScreen
 import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryViewModel
+import com.ketchupzzz.isaom.presentation.main.game.GameScreen
+import com.ketchupzzz.isaom.presentation.main.game.GameViewModel
+import com.ketchupzzz.isaom.presentation.main.gaming.GamingScreen
+import com.ketchupzzz.isaom.presentation.main.gaming.GamingViewModel
 import com.ketchupzzz.isaom.presentation.main.home.HomeScreen
 import com.ketchupzzz.isaom.presentation.main.home.HomeViewModel
 import com.ketchupzzz.isaom.presentation.main.lessons.LessonScreen
@@ -45,12 +55,23 @@ fun MainNavGraph(navHostController: NavHostController,mainNav : NavHostControlle
             HomeScreen(navHostController = navHostController, state = viewModel.state, events = viewModel::events)
         }
         composable(route = AppRouter.AboutScreen.route) {
-
-            AboutScreen()
+            AboutScreen(navHostController= navHostController)
         }
         composable(route = AppRouter.TranslatorScreen.route) {
             val viewModel = hiltViewModel<TranslatorViewModel>()
             TranslatorScreen(state = viewModel.state, events = viewModel::events)
+        }
+        composable(route = AppRouter.GameRoute.route) {
+            val viewModel = hiltViewModel<GameViewModel>()
+            GameScreen(
+                state = viewModel.state,
+                events = viewModel::events,
+                navHostController = navHostController
+            )
+        }
+        composable(route = AppRouter.GamingRoute.route) {
+            val viewModel = hiltViewModel<GamingViewModel>()
+            GamingScreen(state = viewModel.state, events = viewModel::events, navHostController = navHostController)
         }
 
         composable(route = AppRouter.StudentViewSubject.route) {
@@ -112,7 +133,23 @@ fun MainNavGraph(navHostController: NavHostController,mainNav : NavHostControlle
             val viewModel = hiltViewModel<ChangePasswordViewModel>()
             ChangePasswordScreen(state = viewModel.state, events = viewModel::events, navHostController = navHostController)
         }
+        composable(
+            route = AppRouter.EditProfileRoute.route,
 
+            ) {backStackEntry ->
+            val args = backStackEntry.arguments?.getString("args")
+            val decodedJson = URLDecoder.decode(args, StandardCharsets.UTF_8.toString())
+            val users = Gson().fromJson(decodedJson, Users::class.java)
+            val viewModel = hiltViewModel<EditProfileViewModel>()
+            users?.let {
+                EditProfileScreen(
+                    users = it,
+                    state = viewModel.state,
+                    events = viewModel::events,
+                    navHostController = navHostController
+                )
+            }
+        }
     }
 
 }

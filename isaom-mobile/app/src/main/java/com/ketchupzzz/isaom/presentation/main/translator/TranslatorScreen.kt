@@ -1,5 +1,10 @@
 package com.ketchupzzz.isaom.presentation.main.translator
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,12 +38,28 @@ import com.ketchupzzz.isaom.ui.custom.IsaomDropdownMenu
 import com.ketchupzzz.isaom.ui.custom.PrimaryButton
 
 
+fun copyToClipboard(context: Context, text: String) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("Copied Text", text)
+    clipboard.setPrimaryClip(clip)
+    Toast.makeText(context, "Text copied to clipboard", Toast.LENGTH_SHORT).show()
+}
+
+fun shareText(context: Context, text: String) {
+    val intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, text)
+        type = "text/plain"
+    }
+    context.startActivity(Intent.createChooser(intent, "Share via"))
+}
 @Composable
 fun TranslatorScreen(
     modifier: Modifier = Modifier,
     state: TranslatorState,
     events: (TranslatorEvents) -> Unit
 ) {
+    val context = LocalContext.current
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -55,7 +76,11 @@ fun TranslatorScreen(
             )
         }
         items(state.history, { it.id?: "" }) {
-            TranslationCard(history = it, onCopy = {  }, onShare = { })
+            TranslationCard(history = it,
+                onCopy = { copyToClipboard(context =context , text = it.translation?:"")  }
+                , onShare = {
+                    shareText(context,it.translation ?: "")
+                })
         }
 
     }

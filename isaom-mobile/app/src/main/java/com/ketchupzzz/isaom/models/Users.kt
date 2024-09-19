@@ -1,5 +1,10 @@
 package com.ketchupzzz.isaom.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+
+@Parcelize
 data class Users(
     val id : String ? = null,
     val name : String ? = null,
@@ -8,7 +13,8 @@ data class Users(
     val sectionID : String ? = null,
     val gender : Gender ? = null,
     val avatar : String ? = null
-)
+) : Parcelable
+
 
 enum class UserType {
     STUDENT,

@@ -38,4 +38,6 @@ class DictionaryRepositoryImpl(private val firestore: FirebaseFirestore) : Dicti
                 result.invoke(UiState.Error(it.message.toString()))
             }
     }
+
+
 }

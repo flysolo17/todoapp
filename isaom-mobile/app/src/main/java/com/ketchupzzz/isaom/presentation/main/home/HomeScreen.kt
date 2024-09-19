@@ -34,6 +34,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Games
 import androidx.compose.material.icons.filled.SwitchRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -72,6 +73,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.google.android.datatransport.BuildConfig
 import com.google.android.gms.common.internal.Objects
@@ -124,8 +126,15 @@ fun HomeScreen(
             Spacer(modifier = modifier.height(8.dp))
         }
         item {
-
-            FeaturesLayout()
+            GamesLayout()
+        }
+        item {
+            Spacer(modifier = modifier.height(8.dp))
+        }
+        item {
+            FeaturesLayout(
+                navHostController = navHostController
+            )
         }
         if (state.users != null) {
             item {
@@ -138,6 +147,12 @@ fun HomeScreen(
             )
         }
     }
+}
+
+@Composable
+fun GamesLayout() {
+
+
 }
 
 
@@ -172,7 +187,8 @@ fun AboutIlocanoLayout(
 
 @Composable
 fun FeaturesLayout(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController
 ) {
     Card(
         modifier = modifier
@@ -191,7 +207,15 @@ fun FeaturesLayout(
             ) {
                 TextButton(
                     shape = RoundedCornerShape(0.dp),
-                    onClick = { /* Handle click */ },
+                    onClick = {
+                        navHostController.navigate(AppRouter.TranslatorScreen.route) {
+                            popUpTo(navHostController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
                     modifier = modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -204,15 +228,27 @@ fun FeaturesLayout(
                             painter = painterResource(id = R.drawable.translator),
                             contentDescription = "Translator",
                             contentScale = ContentScale.Fit,
-                            modifier = modifier.size(60.dp)
+                            modifier = modifier.size(32.dp)
                         )
-                        Text(text = "Translator", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            text = "Translator",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
 
                 TextButton(
                     shape = RoundedCornerShape(0.dp),
-                    onClick = { /* Handle click */ },
+                    onClick = {
+                        navHostController.navigate(AppRouter.Lessons.route) {
+                            popUpTo(navHostController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
                     modifier = modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -225,9 +261,39 @@ fun FeaturesLayout(
                             painter = painterResource(id = R.drawable.la_american_sign_language_interpreting),
                             contentDescription = "Sign Language",
                             contentScale = ContentScale.Fit,
-                            modifier = modifier.size(60.dp)
+                            modifier = modifier.size(32.dp)
                         )
-                        Text(text = "Sign Language", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            text = "Sign Language",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+
+                TextButton(
+                    shape = RoundedCornerShape(0.dp),
+                    onClick = { navHostController.navigate(AppRouter.GameRoute.route) },
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            imageVector = Icons.Default.Games,
+                            contentDescription = "Game",
+                            contentScale = ContentScale.Fit,
+                            modifier = modifier.size(32.dp)
+                        )
+                        Text(
+                            text = "Games",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }

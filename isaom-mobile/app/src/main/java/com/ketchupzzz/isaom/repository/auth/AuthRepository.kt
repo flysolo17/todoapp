@@ -1,5 +1,6 @@
 package com.ketchupzzz.isaom.repository.auth
 
+import android.net.Uri
 import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.models.Gender
 import com.ketchupzzz.isaom.models.GenderSelection
@@ -10,7 +11,7 @@ interface AuthRepository {
 
 
     fun getUsers() : Users?
-    fun getCurrentUser(result: (UiState<Users>) -> Unit)
+    fun getCurrentUser(result: (UiState<Users?>) -> Unit)
     fun setUser(users: Users ?)
     fun login(email : String, password : String ,result : (UiState<Users>) -> Unit)
 
@@ -36,5 +37,10 @@ interface AuthRepository {
     suspend fun getAllGenderSelection(result: (UiState<GenderSelection>) -> Unit)
 
     suspend fun changePassword(oldPassword : String,newPassword : String,result: (UiState<String>) -> Unit)
+    suspend fun updateUserInfo(
+         uid : String,
+         name : String,
+         result: (UiState<String>) -> Unit
+    )
 
 }

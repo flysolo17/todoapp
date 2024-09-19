@@ -2,6 +2,7 @@ package com.ketchupzzz.isaom.presentation.main.bottombar
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material3.Badge
@@ -33,7 +34,7 @@ fun BottomNavBar(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
-    val bottomBarDestination = items.any { it.route == currentRoute?.route }
+    val bottomBarDestination = items.any { it.route == currentRoute?.route  }
     BottomAppBar(containerColor = MaterialTheme.colorScheme.surface) {
         items.forEachIndexed { index, destinations ->
             val isSelected = currentRoute?.hierarchy?.any {
@@ -41,6 +42,7 @@ fun BottomNavBar(
             } == true
             if (index == 2) {
                 FloatingActionButton(
+                    shape = CircleShape,
                     onClick = { navController.navigate(AppRouter.TranslatorScreen.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true

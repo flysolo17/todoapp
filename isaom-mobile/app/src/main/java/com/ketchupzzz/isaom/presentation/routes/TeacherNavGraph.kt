@@ -3,12 +3,17 @@ package com.ketchupzzz.isaom.presentation.routes
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.google.gson.Gson
+import com.ketchupzzz.isaom.models.Users
 import com.ketchupzzz.isaom.models.subject.module.Content
 import com.ketchupzzz.isaom.presentation.auth.change_password.ChangePasswordScreen
 import com.ketchupzzz.isaom.presentation.auth.change_password.ChangePasswordViewModel
+import com.ketchupzzz.isaom.presentation.auth.edit_profile.EditProfileScreen
+import com.ketchupzzz.isaom.presentation.auth.edit_profile.EditProfileViewModel
 import com.ketchupzzz.isaom.presentation.main.home.HomeScreen
 import com.ketchupzzz.isaom.presentation.main.home.HomeViewModel
 import com.ketchupzzz.isaom.presentation.main.profle.ProfileScreen
@@ -144,6 +149,24 @@ fun TeacherNavGraph(
         composable(route = AppRouter.ChangePassword.route) {
             val viewModel = hiltViewModel<ChangePasswordViewModel>()
             ChangePasswordScreen(state = viewModel.state, events = viewModel::events, navHostController = navHostController)
+        }
+
+        composable(
+            route = AppRouter.EditProfileRoute.route,
+
+        ) {backStackEntry ->
+            val args = backStackEntry.arguments?.getString("args")
+            val decodedJson = URLDecoder.decode(args, StandardCharsets.UTF_8.toString())
+            val users = Gson().fromJson(decodedJson, Users::class.java)
+            val viewModel = hiltViewModel<EditProfileViewModel>()
+            users?.let {
+                EditProfileScreen(
+                    users = it,
+                    state = viewModel.state,
+                    events = viewModel::events,
+                    navHostController = navHostController
+                )
+            }
         }
     }
 

@@ -56,7 +56,6 @@ fun SubjectHeader(
         modifier = modifier
             .height(200.dp)
     ) {
-
         AsyncImage(
             model = subjects.cover,
             contentDescription = "${subjects.name} cover",
@@ -124,19 +123,18 @@ fun SubjectHeader(
             }
             Text(text = subjects.name ?: "", style = MaterialTheme.typography.titleLarge, color = Color.White)
         }
-        if (openAlertDialog.value) {
-            DeleteConfirmationDialog(title = "Delete Subject",
-                message = "Are you sure you want to delete ${subjects.name} ? " +
-                        "By doing so all modules , activities and submissions that is related to this subject is also be deleted",
-                onConfirm = {
-                    events.invoke(ViewSubjectEvents.OnDeleteSubject(subjects))
-                    openAlertDialog.value = false
-                },
-                onDismiss = { openAlertDialog.value = false}
-            )
 
-
-        }
+    }
+    if (openAlertDialog.value) {
+        DeleteConfirmationDialog(title = "Delete Subject",
+            message = "Are you sure you want to delete ${subjects.name} ? " +
+                    "By doing so all modules , activities and submissions that is related to this subject is also be deleted",
+            onConfirm = {
+                events.invoke(ViewSubjectEvents.OnDeleteSubject(subjects))
+                openAlertDialog.value = false
+            },
+            onDismiss = { openAlertDialog.value = false}
+        )
     }
 
 }

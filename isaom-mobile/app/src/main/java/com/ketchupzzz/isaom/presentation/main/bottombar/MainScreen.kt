@@ -30,42 +30,38 @@ fun MainScreen(modifier: Modifier = Modifier, mainNav: NavHostController) {
     val items = BottomNavigationItems.ITEMS
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
-    val bottomBarDestination = items.any { it.route == currentRoute?.route && it.route != AppRouter.ProfileScreen.route }
+    val bottomBarDestination = items.any { it.route == currentRoute?.route || currentRoute?.route == AppRouter.TranslatorScreen.route }
     val destination = currentRoute?.route?.replaceFirstChar {
         if (it.isLowerCase()) it.titlecase(
             Locale.ROOT
         ) else it.toString()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = destination.toString()) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                navigationIcon = {
-                    if (!bottomBarDestination) {
-                        IconButton(onClick = { navHostController.popBackStack() }) {
-                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "back")
-                        }
-                    }
-                }
-
-            )
-        },
-        bottomBar = {
-            if (bottomBarDestination) {
-                BottomNavBar(navController =navHostController,items)
+    if (!bottomBarDestination) {
+        MainNavGraph(navHostController = navHostController, mainNav = mainNav)
+    } else {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(text = destination.toString()) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                )
+            },
+            bottomBar = {
+                    BottomNavBar(navController =navHostController,items)
+            },
+            containerColor = MaterialTheme.colorScheme.surface)
+        {
+            Box(modifier=modifier.padding(it)) {
+                MainNavGraph(navHostController = navHostController, mainNav = mainNav)
             }
-        },
-        containerColor = MaterialTheme.colorScheme.surface) {
-        Box(modifier=modifier.padding(it)) {
-            MainNavGraph(navHostController = navHostController, mainNav = mainNav)
         }
     }
+
 
 }
