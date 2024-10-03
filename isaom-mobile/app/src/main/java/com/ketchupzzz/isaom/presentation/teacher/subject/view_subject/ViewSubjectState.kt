@@ -1,5 +1,7 @@
 package com.ketchupzzz.isaom.presentation.teacher.subject.view_subject
 
+import com.google.firebase.firestore.auth.User
+import com.ketchupzzz.isaom.models.Users
 import com.ketchupzzz.isaom.models.subject.SubjectWithModulesAndActivities
 import com.ketchupzzz.isaom.models.subject.Subjects
 import com.ketchupzzz.isaom.models.subject.activities.Activity
@@ -17,5 +19,6 @@ data class ViewSubjectState(
     val isSubmitting : Boolean = false,
     val submitSuccess : Boolean = false,
     val isDeleting : Boolean = false,
-    val deletionSuccess : String ? = null
+    val deletionSuccess : String ? = null,
+    val students : List<Users> = emptyList()
 )

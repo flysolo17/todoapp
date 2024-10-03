@@ -55,32 +55,37 @@ class HomeViewModel @Inject constructor(
                   target = events.source,
               )
 
-
+              is HomeEvents.OnJoinSubject -> joinSubject(events.studentID,events.sections,events.code)
           }
      }
 
+    private fun joinSubject(studentID: String,sections : List<String>, code: String) {
+        viewModelScope.launch {
+            subjectRepository.joinSubject(
+                studentID = studentID,
+                sections,
+                code = code
+            ) {
+                state = when(it) {
+                    is UiState.Error -> state.copy(error = it.message, joining = false)
+                    UiState.Loading -> state.copy(joining = true, error = null)
+                    is UiState.Success -> state.copy(joining = false, error = null)
+                }
+            }
+        }
+    }
 
 
-    private fun getSubjects(sectionID: String) {
-          viewModelScope.launch {
-               subjectRepository.getSubjectBySectionID(sectionID) {
-                   state =  when(it) {
-                         is UiState.Error -> state.copy(
-                              isLoading = false,
-                              error = it.message
-                         )
-                         is UiState.Loading -> state.copy(
-                              isLoading = true,
-                              error = null,
-                         )
-                         is UiState.Success -> state.copy(
-                              isLoading = false,
-                              error = null,
-                              subjects = it.data
-                         )
-                    }
-               }
-          }
+    private fun getSubjects(studentID : String) {
+        viewModelScope.launch {
+            subjectRepository.getMySubjects(studentID) {
+                if (it is UiState.Success) {
+                    state = state.copy(
+                        subjects = it.data
+                    )
+                }
+            }
+        }
      }
 
 

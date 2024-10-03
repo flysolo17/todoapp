@@ -36,7 +36,10 @@ class AuthRepositoryImpl(val auth : FirebaseAuth, private val firestore: Firebas
             .document(user.uid)
             .addSnapshotListener { value, error ->
                 value?.let {
-                    result.invoke(UiState.Success(it.toObject(Users::class.java)))
+                    result.invoke(UiState.Success(
+                        it.toObject(Users::class.java)
+
+                    ))
                 }
             }
 
@@ -96,9 +99,11 @@ class AuthRepositoryImpl(val auth : FirebaseAuth, private val firestore: Firebas
                     id = results?.uid,
                     name = name,
                     email = email,
-                    sectionID = sectionID, gender = gender,
+                    sections = if (type == UserType.TEACHER) emptyList() else  listOf(sectionID),
+                    gender = gender,
                     type = type,
-                    avatar = avatar?: ""
+                    avatar = avatar,
+                    verified = false,
                 )
                 firestore.collection(USERS_COLLECTION)
                     .document(newUser.id ?: "")
@@ -203,7 +208,6 @@ class AuthRepositoryImpl(val auth : FirebaseAuth, private val firestore: Firebas
                 result.invoke(UiState.Error("User is not logged in."))
             }
         } catch (e: FirebaseAuthInvalidCredentialsException) {
-
             result.invoke(UiState.Error("Old password is incorrect."))
         } catch (e: Exception) {
             result.invoke(UiState.Error(e.message.toString()))
@@ -230,5 +234,61 @@ class AuthRepositoryImpl(val auth : FirebaseAuth, private val firestore: Firebas
             }
     }
 
+    override suspend fun getStudentsInSubject(
+        studentIDS: List<String>,
+        result: (UiState<List<Users>>) -> Unit,
+    ) {
+        result.invoke(UiState.Loading)
+        if (studentIDS.isEmpty()) {
+            result.invoke(UiState.Error("No Students Yet!"))
+            return
+        }
+        firestore.collection(USERS_COLLECTION)
+            .whereIn(
+               "id",
+                studentIDS
+            ).addSnapshotListener { value, error ->
+                value?.let {
+                    result.invoke(UiState.Success(it.toObjects(Users::class.java)))
+                }
+                error?.let {
+                    result.invoke(UiState.Error(it.message.toString()))
+                }
+            }
+    }
 
+    override suspend fun sendEmailVerification(result: (UiState<String>) -> Unit) {
+        val user = auth.currentUser
+        if (user != null) {
+            try {
+                user.sendEmailVerification().await()
+                result.invoke(UiState.Success("Verification email sent successfully"))
+            } catch (e: Exception) {
+                result.invoke(UiState.Error(e.message ?: "Failed to send verification email"))
+            }
+        } else {
+            result.invoke(UiState.Error("No user is currently signed in"))
+        }
+    }
+
+    override suspend fun listenToUserEmailVerification(result: (UiState<Boolean>) -> Unit) {
+        val user = auth.currentUser
+        if (user != null) {
+            user.reload().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val isVerified = user.isEmailVerified
+                    if (isVerified) {
+                        firestore.collection(USERS_COLLECTION)
+                            .document(user.uid)
+                            .update("verified",true)
+                    }
+                    result.invoke(UiState.Success(isVerified))
+                } else {
+                    result.invoke(UiState.Error(task.exception?.message ?: "Failed to reload user"))
+                }
+            }
+        } else {
+            result.invoke(UiState.Error("No user is currently signed in"))
+        }
+    }
 }

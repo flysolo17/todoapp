@@ -54,19 +54,6 @@ fun TeacherMainScreen(modifier: Modifier = Modifier, mainNav: NavHostController)
         Scaffold(
             topBar = {
                     TopAppBar(
-                        actions = {
-                            if (currentRoute?.route == AppRouter.TeacherDashboard.route)
-                                OutlinedIconButton(
-                                    onClick = { navHostController.navigate(AppRouter.CreateSubject.route) },
-                                    shape = RoundedCornerShape(4.dp),
-                                    border = BorderStroke(
-                                        width = 3.dp,
-                                        color = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                ) {
-                                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Subject")
-                                }
-                        },
                         title = { Text(text = currentRoute?.route.toString()) },
                         colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -75,7 +62,7 @@ fun TeacherMainScreen(modifier: Modifier = Modifier, mainNav: NavHostController)
                     ),
                         navigationIcon = {
                         val route = currentRoute?.route
-                        if (route != AppRouter.ProfileScreen.route && route != AppRouter.TeacherDashboard.route) {
+                        if (route != AppRouter.ProfileScreen.route && route != AppRouter.TeacherDashboard.route &&     route != AppRouter.TeacherLeaderboard.route) {
                             IconButton(onClick = { navHostController.navigateUp() }) {
                                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                             }
@@ -85,7 +72,10 @@ fun TeacherMainScreen(modifier: Modifier = Modifier, mainNav: NavHostController)
             },
             bottomBar = {
                 val route = currentRoute?.route
-                if (route == AppRouter.ProfileScreen.route || route== AppRouter.TeacherDashboard.route) {
+                if (route == AppRouter.ProfileScreen.route ||
+                    route== AppRouter.TeacherDashboard.route ||
+                    route == AppRouter.TeacherLeaderboard.route
+                    ) {
                     BottomNav(
                         navController = navHostController,
                         items = items,

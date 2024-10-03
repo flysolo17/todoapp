@@ -1,7 +1,7 @@
 package com.ketchupzzz.isaom.presentation.teacher.subject.add_subject
 
 import android.net.Uri
-import com.ketchupzzz.isaom.models.Sections
+import com.ketchupzzz.isaom.models.sections.Sections
 
 
 sealed interface AddSubjectEvents {
@@ -10,4 +10,6 @@ sealed interface AddSubjectEvents {
     data class OnAddingSubject(val sectionID : String): AddSubjectEvents
 
     data class OnSectionSelected(val sections: Sections?) : AddSubjectEvents
+
+    data class OnGetAllSections(val sections : List<String>) : AddSubjectEvents
 }

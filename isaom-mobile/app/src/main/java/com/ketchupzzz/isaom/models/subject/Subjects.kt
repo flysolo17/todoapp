@@ -12,5 +12,7 @@ data class Subjects(
     val name : String ? = null,
     var cover : String ? = null,
     val sectionID : String ? = null,
+    val code : String ? = null,
+    val students : List<String> = emptyList(),
     val createdAt : Date ? = null,
 ) : Parcelable

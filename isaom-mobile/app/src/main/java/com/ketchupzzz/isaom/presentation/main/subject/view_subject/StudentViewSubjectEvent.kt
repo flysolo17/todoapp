@@ -5,4 +5,11 @@ import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.ViewSubjec
 sealed interface StudentViewSubjectEvent {
     data class OnGetSubjectModules(val subjectID : String) : StudentViewSubjectEvent
     data class OnGetSubjectActivities(val subjectID : String) : StudentViewSubjectEvent
+
+    data class OnGetSubject(
+        val subjectID: String,
+
+    ) : StudentViewSubjectEvent
+
+    data object OnGetSubmissions : StudentViewSubjectEvent
 }

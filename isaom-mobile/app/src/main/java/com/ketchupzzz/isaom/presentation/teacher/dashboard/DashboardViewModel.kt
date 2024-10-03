@@ -22,30 +22,35 @@ class DashboardViewModel @Inject constructor(
     var state by mutableStateOf(DashboardState())
 
     init {
-        val user = authRepository.getUsers()
-        user?.let {
-            events(DashboardEvents.OnGetAllSectionWithSubjects(it.id!!))
-        }
 
+        viewModelScope.launch {
+            authRepository.getCurrentUser {
+                if (it is UiState.Success) {
+                    state = state.copy(
+                        users = it.data
+                    )
+                    events(DashboardEvents.OnGetAllSectionWithSubjects(sections = state.users?.sections ?: emptyList()))
+                }
+            }
+        }
     }
     fun events(event: DashboardEvents) {
         when(event) {
-            is DashboardEvents.OnGetAllSectionWithSubjects -> getAllSectionWithSubject(event.userID)
+            is DashboardEvents.OnGetAllSectionWithSubjects -> getAllSectionWithSubject(event.sections)
         }
     }
 
-    private fun getAllSectionWithSubject(uid: String) {
+    private fun getAllSectionWithSubject(sections : List<String>) {
         viewModelScope.launch {
-            sectionRepository.getAllSectionWithSubjects(uid) {
+            sectionRepository.getAllSectionsByTeacher(sections) {
                 state = when(it) {
-                    is UiState.Error -> state.copy(isLoading = false)
-                    is UiState.Loading -> state.copy(isLoading = true)
+                    is UiState.Error -> state.copy(isLoading = false, errors = it.message)
+                    is UiState.Loading -> state.copy(isLoading = true, errors = null)
                     is UiState.Success ->  {
-                        sectionRepository.setSectionWithSubject(it.data)
-                        Log.d("section",it.data.toString())
                         state.copy(
                             isLoading = false,
-                            sectionWithSubjects = it.data,
+                            errors = null,
+                            sections = it.data,
                         )
                     }
                 }

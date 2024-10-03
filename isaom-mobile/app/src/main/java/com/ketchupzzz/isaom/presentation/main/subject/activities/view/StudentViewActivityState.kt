@@ -7,5 +7,6 @@ data class StudentViewActivityState(
     val isLoading : Boolean  = false,
     val questions : List<Question> = emptyList(),
     val errors : String ? = null,
-    val answers : List<String> = emptyList(),
+    val answers: Map<String, String> = hashMapOf(),
+    val isSubmitted : String ? = null
 )

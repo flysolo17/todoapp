@@ -30,7 +30,10 @@ fun MainScreen(modifier: Modifier = Modifier, mainNav: NavHostController) {
     val items = BottomNavigationItems.ITEMS
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
-    val bottomBarDestination = items.any { it.route == currentRoute?.route || currentRoute?.route == AppRouter.TranslatorScreen.route }
+    val bottomBarDestination = items.any {
+        it.route == currentRoute?.route || currentRoute?.route == AppRouter.TranslatorScreen.route
+
+    }
     val destination = currentRoute?.route?.replaceFirstChar {
         if (it.isLowerCase()) it.titlecase(
             Locale.ROOT

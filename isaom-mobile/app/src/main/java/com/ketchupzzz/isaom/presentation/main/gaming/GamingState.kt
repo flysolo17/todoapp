@@ -1,6 +1,6 @@
 package com.ketchupzzz.isaom.presentation.main.gaming
 
-import com.ketchupzzz.isaom.models.Games
+import com.ketchupzzz.isaom.models.games.Games
 import com.ketchupzzz.isaom.models.WordTranslate
 
 

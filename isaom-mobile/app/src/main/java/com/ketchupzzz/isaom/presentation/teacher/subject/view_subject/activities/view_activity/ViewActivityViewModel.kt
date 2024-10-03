@@ -8,7 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.models.subject.activities.Question
+import com.ketchupzzz.isaom.models.submissions.AnswersByQuestion
 import com.ketchupzzz.isaom.repository.activity.ActivityRepository
+import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.submissions.SubmissionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 
 class ViewActivityViewModel @Inject constructor(
-     private val activityRepository: ActivityRepository
+     private val activityRepository: ActivityRepository,
+    private val submissionRepository: SubmissionRepository
 ) : ViewModel() {
     var state by mutableStateOf(ViewActivityState())
     
@@ -26,6 +29,75 @@ class ViewActivityViewModel @Inject constructor(
             is ViewActivityEvents.OnSaveQuestion -> createQuestion(e.actvityID,e.question,e.uri,e.result)
             is ViewActivityEvents.OnGetQuestionByActivityID -> getQuestions(e.activityID)
             is ViewActivityEvents.OnEdeleteQuestion -> deleteQuestion(e.activityID,e.question)
+            is ViewActivityEvents.OnGetAllSubmissionsByActivityID -> getSubmissions(e.id,e.question)
+        }
+    }
+
+    private fun getQuestions(activityID: String) {
+        viewModelScope.launch {
+            activityRepository.getQuestionByActivityID(activityID) {
+                when(it) {
+                    is UiState.Error ->state = state.copy(isLoading = false, errors = it.message)
+                    is UiState.Loading ->state = state.copy(isLoading = true, errors = null)
+                    is UiState.Success -> {
+                        state = state.copy(isLoading = false, errors = null, questions = it.data)
+                        events(ViewActivityEvents.OnGetAllSubmissionsByActivityID(activityID,it.data))
+                    }
+                }
+            }
+        }
+    }
+    private fun getSubmissions(id: String, questions: List<Question>) {
+        viewModelScope.launch {
+            submissionRepository.getSubmissionsByActivityID(activityID = id) { result ->
+                when (result) {
+                    is UiState.Error -> state = state.copy(
+                        isLoading = false,
+                        errors = result.message
+                    )
+
+                    is UiState.Loading -> state = state.copy(
+                        isLoading = true,
+                        errors = null
+                    )
+
+                    is UiState.Success -> {
+                        val submissionWithStudent = result.data
+                        val answersByQuestion = questions.map { question ->
+                            val answers = mutableMapOf<String, String>()
+                            var correctAnswers = 0
+                            var wrongAnswers = 0
+
+                            submissionWithStudent.forEach { submission ->
+                                val answer = submission.submissions!!.answerSheet[question.id]
+                                if (answer != null) {
+                                    answers[submission.submissions.id!!] = answer
+                                    if (answer == question.answer) {
+                                        correctAnswers++
+                                    } else {
+                                        wrongAnswers++
+                                    }
+                                }
+                            }
+
+                            AnswersByQuestion(
+                                question = question,
+                                answers = answers,
+                                correctAnswers = correctAnswers,
+                                wrongAnswers = wrongAnswers,
+                                totalSubmissions = answers.size
+                            )
+                        }
+
+                        state = state.copy(
+                            isLoading = false,
+                            errors = null,
+                            submissionWithStudent = submissionWithStudent,
+                            answersByQuestion = answersByQuestion
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -51,17 +123,7 @@ class ViewActivityViewModel @Inject constructor(
         }
     }
 
-    private fun getQuestions(activityID: String) {
-        viewModelScope.launch {
-            activityRepository.getQuestionByActivityID(activityID) {
-                state = when(it) {
-                    is UiState.Error -> state.copy(isLoading = false, errors = it.message)
-                    is UiState.Loading -> state.copy(isLoading = true, errors = null)
-                    is UiState.Success -> state.copy(isLoading = false, errors = null, questions = it.data)
-                }
-            }
-        }
-    }
+
 
     private fun createQuestion(activityID : String ,question: Question,uri : Uri?, result: (UiState<String>) -> Unit) {
         viewModelScope.launch {

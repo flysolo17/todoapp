@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Games
 import androidx.compose.material.icons.filled.SwitchRight
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -44,6 +46,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -89,6 +93,7 @@ import com.ketchupzzz.isaom.ui.custom.IsaomDropdownMenu
 import com.ketchupzzz.isaom.ui.custom.PrimaryButton
 import com.ketchupzzz.isaom.ui.custom.SubjectCard
 import com.ketchupzzz.isaom.utils.createImageFile
+import com.ketchupzzz.isaom.utils.toast
 
 @Composable
 fun HomeScreen(
@@ -100,7 +105,7 @@ fun HomeScreen(
     val context = LocalContext.current
     LaunchedEffect(state) {
         if (state.users != null) {
-            events(HomeEvents.OnGetSubjects(state.users.sectionID?:""))
+            events(HomeEvents.OnGetSubjects(state.users.id ?:""))
         }
     }
     LazyColumn(
@@ -138,7 +143,7 @@ fun HomeScreen(
         }
         if (state.users != null) {
             item {
-                SubjectLayout(state = state, navHostController = navHostController)
+                SubjectLayout(state = state, events = events, navHostController = navHostController)
             }
         }
         item {
@@ -350,25 +355,102 @@ fun CameraButton(
 fun SubjectLayout(
     modifier: Modifier = Modifier,
     state: HomeState,
+    events: (HomeEvents) -> Unit,
     navHostController: NavHostController
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(state) {
+        if (state.error != null) {
+            context.toast(state.error)
+        }
+    }
+
     Column(
         modifier = modifier
             .wrapContentSize()
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = "Subjects",
-            style = MaterialTheme.typography.titleMedium
-        )
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Subjects",
+                style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                text
+                = "(${state.subjects.size})",
+                style = MaterialTheme.typography.titleSmall.copy(
+                    color = MaterialTheme.colorScheme.primary
+                ),
+
+            )
+        }
+        JoinSubjectButton {
+            events.invoke(HomeEvents.OnJoinSubject(
+                state.users?.id?:"",
+                state.users?.sections ?: emptyList(),
+                it
+            ))
+        }
 
         state.subjects.forEach {subject->
             SubjectCard(subject = subject,
                 onClick = {
                     navHostController.navigate(AppRouter.StudentViewSubject.createRoute(subject))
                 }
-            )
+            ) {}
         }
     }
+}
+
+
+@Composable
+fun JoinSubjectButton(
+    modifier: Modifier = Modifier,
+    onJoin : (String) -> Unit
+) {
+    var code by remember {
+        mutableStateOf("")
+    }
+    OutlinedCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            BasicTextField(
+                value = code,
+                onValueChange = { code = it },
+                modifier = modifier.weight(1f),
+                singleLine = true,
+
+                textStyle = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                decorationBox = { innerTextField ->
+                    if (code.isEmpty()) {
+                        Text(
+                            text = "Enter code",
+                        )
+                    }
+                    innerTextField()
+                }
+            )
+            FilledIconButton(
+                onClick = { onJoin(code) }) {
+                Icon(imageVector = Icons.Rounded.Search, contentDescription = "Search")
+            }
+        }
+
+    }
+
 }

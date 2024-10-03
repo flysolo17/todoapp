@@ -12,6 +12,7 @@ import com.ketchupzzz.isaom.models.subject.Subjects
 import com.ketchupzzz.isaom.models.subject.activities.Activity
 import com.ketchupzzz.isaom.models.subject.module.Modules
 import com.ketchupzzz.isaom.repository.activity.ActivityRepository
+import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.repository.modules.ModuleRepository
 import com.ketchupzzz.isaom.repository.subject.SubjectRepository
 import com.ketchupzzz.isaom.utils.UiState
@@ -26,7 +27,8 @@ import javax.inject.Inject
 class ViewSubjectViewModel @Inject constructor(
      private val subjectRepository: SubjectRepository,
     private  val moduleRepository: ModuleRepository,
-    private val activityRepository: ActivityRepository
+    private val activityRepository: ActivityRepository,
+    private  val authRepository: AuthRepository,
 ) : ViewModel() {
     var state by mutableStateOf(ViewSubjectState())
     init {
@@ -192,12 +194,27 @@ class ViewSubjectViewModel @Inject constructor(
                     is UiState.Error -> state.copy(errors = it.message, isLoading = false)
                     is UiState.Loading -> state.copy(errors = null, isLoading = true)
                     is UiState.Success -> {
+                        if (it.data != null) {
+                            getStudents(it.data)
+                        }
                         state.copy(
                             errors = null,
                             isLoading = false,
                             subjects = it.data,
                         )
                     }
+                }
+            }
+        }
+    }
+
+    private fun getStudents(subjects: Subjects) {
+        viewModelScope.launch {
+            authRepository.getStudentsInSubject(subjects.students) {
+                if (it is UiState.Success) {
+                    state = state.copy(
+                        students = it.data
+                    )
                 }
             }
         }

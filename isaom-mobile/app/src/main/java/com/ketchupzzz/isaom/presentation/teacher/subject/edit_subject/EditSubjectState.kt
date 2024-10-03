@@ -1,7 +1,7 @@
 package com.ketchupzzz.isaom.presentation.teacher.subject.edit_subject
 
 import android.net.Uri
-import com.ketchupzzz.isaom.models.Sections
+import com.ketchupzzz.isaom.models.sections.Sections
 import com.ketchupzzz.isaom.models.subject.Subjects
 
 

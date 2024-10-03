@@ -123,6 +123,7 @@ class ActivityRepositoryImpl(private val firestore: FirebaseFirestore,private va
         firestore.collection(ACTIVITY_COLLECTION)
             .document(activityID)
             .collection(QUESTION_COLLECTION)
+            .orderBy("createdAt",Query.Direction.ASCENDING)
             .addSnapshotListener { value, error ->
                 value?.let {
                     result.invoke(UiState.Success(it.toObjects(Question::class.java)))

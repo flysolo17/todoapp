@@ -90,11 +90,7 @@ val context = LocalContext.current
                             contentColor = MaterialTheme.colorScheme.onSecondary,
                             containerColor = MaterialTheme.colorScheme.secondary
                         ),
-                        onClick = { Toast.makeText(
-                            context,
-                            "Not implemented yet",
-                            Toast.LENGTH_SHORT
-                        ).show() })
+                        onClick = { navHostController.navigate(AppRouter.LeaderboardRoute.route) })
                     {
                         Text(text ="Leaderboard", modifier = modifier.padding(8.dp))
                     }

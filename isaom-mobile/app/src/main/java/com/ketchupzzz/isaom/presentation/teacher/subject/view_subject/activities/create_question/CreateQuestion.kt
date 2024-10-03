@@ -76,20 +76,21 @@ fun CreateQuestion(
     val context = LocalContext.current
     question?.let {
         state = state.copy(
-
             title = it.title ?: "",
             desc = it.desc ?: "",
             uri = it.image?.toUri(),
-            actions = it.actions,
             choices = it.choices,
             answer = it.answer ?: "",
-            points = it.points ?: 0.00,
+            points = it.points,
         )
     }
     var showDialog by remember { mutableStateOf(false) }
     
-    IconButton(onClick = { showDialog = true }) {
-        Icon(imageVector = Icons.Default.AddCircle, contentDescription ="Add Activity" )
+    PrimaryButton(
+        modifier = modifier.padding(8.dp),
+        onClick = { showDialog = true }
+    ) {
+        Text(text = "Create Question",modifier = modifier.padding(8.dp))
     }
     if (showDialog) {
         Dialog(
@@ -145,28 +146,7 @@ fun CreateQuestion(
                             .fillMaxWidth()
                             .padding(8.dp)
                     )
-                    CreateActionButton(
-                        label = "Add Actions"
-                    ) { text ->
-                        val currentActions : List<String> = state.actions
-                        state = state.copy(
-                            actions = currentActions + text
-                        )
-                    }
-                    Column {
-                        if (state.actions.isNotEmpty()) {
-                            Text(text = "Actions", style = MaterialTheme.typography.titleMedium, modifier = modifier.padding(8.dp))
 
-                        }
-                        state.actions.forEach {
-                            CardContainer(text = it) {action ->
-                                val currentActions : List<String> = state.actions
-                                state = state.copy(
-                                    actions = currentActions.filter { it != action }
-                                )
-                            }
-                        }
-                    }
 
 
                     CreateActionButton(
@@ -191,7 +171,7 @@ fun CreateQuestion(
                         }
                     }
 
-                    AddImage(state = state) {
+                    AddImage(selectedImage = state.uri) {
                         state = state.copy(uri = it)
                     }
 
@@ -234,7 +214,9 @@ fun CreateQuestion(
                     }
                     TextField(
                         value = state.points.toString(),
-                        onValueChange = { state = state.copy(points = it.toDoubleOrNull() ?: 0.0) },
+                        onValueChange = { num ->
+                            state = state.copy(points = num.toIntOrNull() ?: 0)
+                                        },
                         label = { Text("Points") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -242,6 +224,7 @@ fun CreateQuestion(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                     PrimaryButton(
+                        modifier = modifier.padding(16.dp),
                         isLoading = state.isLoading,
                         onClick = {
                             val newQuestion = question.generateNewQuestion(state)
@@ -276,7 +259,6 @@ fun Question?.generateNewQuestion(state : CreateQuestionState) : Question{
         title = question.title ,
         desc = question.desc,
         image = question.image,
-        actions = question.actions,
         choices = question.choices,
         answer = question.answer,
         points = question.points,
@@ -285,7 +267,6 @@ fun Question?.generateNewQuestion(state : CreateQuestionState) : Question{
             title = state.title ,
             desc = state.desc,
             image = "",
-            actions = state.actions,
             choices = state.choices,
             answer = state.answer,
             points = state.points,
@@ -374,7 +355,7 @@ fun CardContainer(
 @Composable
 fun AddImage(
     modifier: Modifier = Modifier,
-    state: CreateQuestionState,
+    selectedImage : Uri?,
     onImageSelected : (uri : Uri ?) -> Unit
 ) {
     val launcher = rememberLauncherForActivityResult(
@@ -400,7 +381,7 @@ fun AddImage(
 
             }
         }
-        state.uri?.let {
+        selectedImage?.let {
             Image(
                 painter = rememberAsyncImagePainter(it),
                 contentDescription = "Selected Image",

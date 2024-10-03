@@ -122,8 +122,12 @@ dependencies {
     implementation("de.charlex.compose.material3:material3-html-text:2.0.0-beta01")
 
 
+
     //ml kit
     implementation ("com.google.mlkit:text-recognition:16.0.1")
+
+    //charts
+    implementation ("io.github.ehsannarmani:compose-charts:0.0.13")
 }
 
 

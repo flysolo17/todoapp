@@ -23,6 +23,10 @@ import com.ketchupzzz.isaom.presentation.teacher.subject.add_subject.CreateSubje
 import com.ketchupzzz.isaom.presentation.teacher.subject.add_subject.SubjectViewModel
 import com.ketchupzzz.isaom.presentation.teacher.dashboard.DashboardScreen
 import com.ketchupzzz.isaom.presentation.teacher.dashboard.DashboardViewModel
+import com.ketchupzzz.isaom.presentation.teacher.leaderboard.LeaderboardScreen
+import com.ketchupzzz.isaom.presentation.teacher.leaderboard.LeaderboardViewModel
+import com.ketchupzzz.isaom.presentation.teacher.sections.view_section.ViewSectionScreen
+import com.ketchupzzz.isaom.presentation.teacher.sections.view_section.ViewSectionViewModel
 import com.ketchupzzz.isaom.presentation.teacher.subject.edit_subject.EditSubjectScreen
 import com.ketchupzzz.isaom.presentation.teacher.subject.edit_subject.EditSubjectViewModel
 import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.ViewSubjectScreen
@@ -64,9 +68,15 @@ fun TeacherNavGraph(
                 events = viewModel::events,
             )
         }
+        composable(route = AppRouter.ViewSection.route) {
+            val viewModel = hiltViewModel<ViewSectionViewModel>()
+            val sectionID = it.arguments?.getString("sectionID") ?: ""
+            ViewSectionScreen(sectionID = sectionID, state = viewModel.state, events = viewModel::events, navHostController = navHostController)
+        }
 
-        composable(route = AppRouter.TeacherSubmissions.route) {
-            SubmissionScreen()
+        composable(route = AppRouter.TeacherLeaderboard.route) {
+            val viewModel = hiltViewModel<LeaderboardViewModel>()
+            LeaderboardScreen(state = viewModel.state, events = viewModel::events, navHostController = navHostController)
         }
 
 

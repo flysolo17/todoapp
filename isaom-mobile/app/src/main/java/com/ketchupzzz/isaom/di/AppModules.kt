@@ -21,6 +21,8 @@ import com.ketchupzzz.isaom.repository.sections.SectionRepository
 import com.ketchupzzz.isaom.repository.sections.SectionRepositoryImpl
 import com.ketchupzzz.isaom.repository.subject.SubjectRepository
 import com.ketchupzzz.isaom.repository.subject.SubjectRepositoryImpl
+import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.submissions.SubmissionRepository
+import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.submissions.SubmissionRepositoryImpl
 import com.ketchupzzz.isaom.repository.translator.TranslatorRepository
 import com.ketchupzzz.isaom.repository.translator.TranslatorRepositoryImpl
 import com.ketchupzzz.isaom.services.TranslatorService
@@ -136,5 +138,11 @@ object AppModule {
     @Singleton
     fun provideGameRepository(@ApplicationContext context: Context,auth: FirebaseAuth,firestore: FirebaseFirestore) : GameRepository {
         return GameRepositoryImpl(context,auth,firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSubmissionsRepository(firestore: FirebaseFirestore) : SubmissionRepository {
+        return SubmissionRepositoryImpl(firestore)
     }
   }

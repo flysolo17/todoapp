@@ -32,10 +32,10 @@ fun PrimaryButton(
             .fillMaxWidth()
             .height(50.dp),
         shape = RoundedCornerShape(10.dp),
+
     )  {
         if (isLoading) {
             Row(
-
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {

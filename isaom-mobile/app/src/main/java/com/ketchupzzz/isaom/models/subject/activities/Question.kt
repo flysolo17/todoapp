@@ -8,10 +8,10 @@ data class Question(
     val title : String ? = null,
     val desc : String ? = null,
     var image : String ? = null,
-    val actions : List<String> = emptyList(),
+
     val choices : List<String> = emptyList(),
     val answer : String ? = null,
-    val points : Double ? = null,
+    val points : Int  = 0,
     val createdAt : Date = Date()
 
 )

@@ -43,4 +43,13 @@ interface AuthRepository {
          result: (UiState<String>) -> Unit
     )
 
+    suspend fun getStudentsInSubject(
+        studentIDS: List<String>,
+        result: (UiState<List<Users>>) -> Unit
+    )
+
+    suspend fun sendEmailVerification(result: (UiState<String>) -> Unit)
+
+    suspend fun listenToUserEmailVerification(result: (UiState<Boolean>) -> Unit)
+
 }

@@ -5,8 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.models.subject.Subjects
+import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.repository.sections.SectionRepository
 import com.ketchupzzz.isaom.repository.subject.SubjectRepository
 import com.ketchupzzz.isaom.utils.generateRandomString
@@ -19,16 +22,26 @@ import javax.inject.Inject
 @HiltViewModel
 
 class SubjectViewModel @Inject constructor(
-    private val sectionRepository: SectionRepository,
-     private val subjectRepository: SubjectRepository
+private  val sectionRepository: SectionRepository,
+     private val subjectRepository: SubjectRepository,
+    private val authService : AuthRepository
 ) : ViewModel() {
 
     var state by mutableStateOf(AddSubjectState())
     init {
+        viewModelScope.launch {
+            authService.getCurrentUser {
+                if (it is UiState.Success) {
+                    state = state.copy(
+                        users = it.data
+                    )
+                    events(AddSubjectEvents.OnGetAllSections(state.users?.sections ?: emptyList()))
+                }
 
-        state = state.copy(
-            sections = sectionRepository.getSectionWithSubject().map { it.sections!! }
-        )
+            }
+        }
+
+
     }
     fun events(events: AddSubjectEvents) {
         when(events) {
@@ -36,6 +49,28 @@ class SubjectViewModel @Inject constructor(
             is AddSubjectEvents.OnCoverSelected -> state = state.copy(cover=events.uri)
             is AddSubjectEvents.OnNameChanged ->state = state.copy(name=events.name)
             is AddSubjectEvents.OnSectionSelected -> state = state.copy(selectedSection = events.sections)
+            is AddSubjectEvents.OnGetAllSections -> getAlSections(events.sections)
+        }
+    }
+    private fun getAlSections(sections : List<String>) {
+        viewModelScope.launch {
+            sectionRepository.getAllSectionsByTeacher(sections) {
+                state = when(it) {
+                    is UiState.Error -> state.copy(
+                        isLoading = false,
+                        error = it.message
+                    )
+                    UiState.Loading -> state.copy(
+                        isLoading = true,
+                        error = null
+                    )
+                    is UiState.Success -> state.copy(
+                        isLoading = false,
+                        error = null,
+                        sections = it.data
+                    )
+                }
+            }
         }
     }
 
@@ -44,6 +79,7 @@ class SubjectViewModel @Inject constructor(
             id = generateRandomString(),
             name = state.name,
             sectionID = sectionID,
+            code = generateRandomString(8),
             createdAt = Date()
         )
         if (state.cover === null) {

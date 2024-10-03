@@ -12,5 +12,9 @@ sealed interface HomeEvents {
     data class OnTargetChanged(val target: SourceAndTargets) : HomeEvents
     data class OnSwitchLanguage(val source : SourceAndTargets,val target: SourceAndTargets) : HomeEvents
 
-
+    data class OnJoinSubject(
+        val studentID : String,
+        val sections : List<String>,
+        val code : String,
+    ) : HomeEvents
 }

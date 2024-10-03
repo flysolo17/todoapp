@@ -25,11 +25,11 @@ data class BottomNavigationItems(
                 route = AppRouter.TeacherDashboard.route
             ),
             BottomNavigationItems(
-                label = "Submissions",
+                label = "Leaderboard",
                 selectedIcon = R.drawable.file_text,
                 unselectedIcon = R.drawable.file_text_filled,
                 hasNews = false,
-                route = AppRouter.TeacherSubmissions.route
+                route = AppRouter.TeacherLeaderboard.route
             ),
             BottomNavigationItems(
                 label = "Profile",

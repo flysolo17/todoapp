@@ -3,6 +3,7 @@ package com.ketchupzzz.isaom.ui.custom
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,7 +26,9 @@ import com.ketchupzzz.isaom.models.subject.Subjects
 fun SubjectCard(
     modifier: Modifier = Modifier,
     subject : Subjects,
-    onClick : (subjectID : String) -> Unit
+
+    onClick : (subjectID : String) -> Unit,
+    content : @Composable () -> Unit,
 ) {
     //add background image and overlay to the box and Text in the bottom Left
     Box(modifier = modifier
@@ -53,14 +56,18 @@ fun SubjectCard(
                 .background(Color.Black.copy(alpha = 0.3f))
         )
 
-        // Bottom-left Text
-        Text(
-            text = subject.name ?: "No Subject name",
-            color = Color.White,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(8.dp)
-        )
+        Column(
+            modifier = modifier.fillMaxWidth().align(Alignment.BottomStart)
+        ) {
+            Text(
+                text = subject.name ?: "No Subject name",
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .padding(8.dp)
+            )
+            content()
+        }
+
     }
 }

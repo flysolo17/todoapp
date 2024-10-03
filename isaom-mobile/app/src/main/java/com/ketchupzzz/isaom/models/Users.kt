@@ -10,9 +10,10 @@ data class Users(
     val name : String ? = null,
     val email : String ? = null,
     val type : UserType ? = null,
-    val sectionID : String ? = null,
+    val sections : List<String>  = emptyList(),
     val gender : Gender ? = null,
-    val avatar : String ? = null
+    val avatar : String ? = null,
+    val verified : Boolean ? = null,
 ) : Parcelable
 
 

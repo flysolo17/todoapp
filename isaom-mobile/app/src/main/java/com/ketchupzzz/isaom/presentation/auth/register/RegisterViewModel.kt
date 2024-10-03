@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.models.Gender
-import com.ketchupzzz.isaom.models.Sections
+import com.ketchupzzz.isaom.models.sections.Sections
 import com.ketchupzzz.isaom.models.UserType
 import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.repository.sections.SECTION_COLLECTION

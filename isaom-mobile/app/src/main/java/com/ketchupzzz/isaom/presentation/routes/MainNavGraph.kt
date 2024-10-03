@@ -26,6 +26,9 @@ import com.ketchupzzz.isaom.presentation.main.gaming.GamingScreen
 import com.ketchupzzz.isaom.presentation.main.gaming.GamingViewModel
 import com.ketchupzzz.isaom.presentation.main.home.HomeScreen
 import com.ketchupzzz.isaom.presentation.main.home.HomeViewModel
+
+import com.ketchupzzz.isaom.presentation.main.leaderboard.StudentLeaderboardScreen
+import com.ketchupzzz.isaom.presentation.main.leaderboard.StudentLeaderboardViewModel
 import com.ketchupzzz.isaom.presentation.main.lessons.LessonScreen
 import com.ketchupzzz.isaom.presentation.main.lessons.LessonViewModel
 import com.ketchupzzz.isaom.presentation.main.profle.ProfileScreen
@@ -69,6 +72,14 @@ fun MainNavGraph(navHostController: NavHostController,mainNav : NavHostControlle
                 navHostController = navHostController
             )
         }
+        composable(route = AppRouter.LeaderboardRoute.route) {
+            val viewModel = hiltViewModel<StudentLeaderboardViewModel>()
+            StudentLeaderboardScreen(
+                state = viewModel.state,
+                events = viewModel::events,
+                navHostController = navHostController
+            )
+        }
         composable(route = AppRouter.GamingRoute.route) {
             val viewModel = hiltViewModel<GamingViewModel>()
             GamingScreen(state = viewModel.state, events = viewModel::events, navHostController = navHostController)
@@ -81,14 +92,13 @@ fun MainNavGraph(navHostController: NavHostController,mainNav : NavHostControlle
             val content = Gson().fromJson(decodedJson, Subjects::class.java)
             val viewModel = hiltViewModel<StudentViewSubjectViewModel>()
             StudentViewSubjectScreen(
-                subjects = content,
+                subjectID = content.id ?: "",
                 state = viewModel.state,
                 event = viewModel::events,
                 navHostController = navHostController,
             )
         }
         composable(route = AppRouter.StudentViewModule.route) {
-
             val args = it.arguments?.getString("args")
             val decodedJson = URLDecoder.decode(args, StandardCharsets.UTF_8.toString())
             val content = Gson().fromJson(decodedJson, Modules::class.java)
@@ -101,9 +111,7 @@ fun MainNavGraph(navHostController: NavHostController,mainNav : NavHostControlle
             )
         }
 
-
         composable(route = AppRouter.StudentViewActivity.route) {
-
             val args = it.arguments?.getString("args")
             val decodedJson = URLDecoder.decode(args, StandardCharsets.UTF_8.toString())
             val content = Gson().fromJson(decodedJson, Activity::class.java)
@@ -115,12 +123,10 @@ fun MainNavGraph(navHostController: NavHostController,mainNav : NavHostControlle
                 navHostController = navHostController,
             )
         }
-
         composable(route = AppRouter.Dictionary.route) {
             val viewModel = hiltViewModel<DictionaryViewModel>()
             DictionaryScreen(navHostController = navHostController, state = viewModel.state, events = viewModel::events )
         }
-
         composable(route = AppRouter.Lessons.route) {
             val viewModel = hiltViewModel<LessonViewModel>()
             LessonScreen(navHostController = navHostController, state = viewModel.state, events = viewModel::events )

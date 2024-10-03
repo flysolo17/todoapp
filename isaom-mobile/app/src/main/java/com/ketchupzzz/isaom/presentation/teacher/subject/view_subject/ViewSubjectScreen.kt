@@ -108,10 +108,7 @@ fun ViewSubjectScreen(
                     SubjectHeader(subjects = state.subjects, navHostController = navHostController, events = events, state = state)
                 }
             ) {
-                // Remember the pager state for the tab layout
-                val pagerState = rememberPagerState(pageCount = {2})
-
-                // Provide a scope for the tab layout's coroutine operations
+                val pagerState = rememberPagerState(pageCount = {3})
                 val scope = rememberCoroutineScope()
 
                 Column(modifier = modifier.padding(it)) {

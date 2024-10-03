@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets
 sealed class AppRouter(val route : String) {
     data object AuthRoutes : AppRouter(route = "auth")
     data object LoginScreen : AppRouter(route = "login")
+    data object VerificationScreen : AppRouter(route = "verification")
 
     data object RegisterScreen : AppRouter(route = "register")
     data object ForgotPasswordScreen : AppRouter(route = "forgot-password")
@@ -24,6 +25,7 @@ sealed class AppRouter(val route : String) {
     data object MainRoutes : AppRouter(route = "main")
     data object GameRoute : AppRouter(route = "game")
     data object GamingRoute : AppRouter(route = "gaming")
+    data object LeaderboardRoute : AppRouter(route = "student-leaderboard")
     data object HomeScreen: AppRouter(route = "home")
     data object ChangePassword : AppRouter(route = "change-password")
 
@@ -65,6 +67,11 @@ sealed class AppRouter(val route : String) {
     data object TeacherDashboard : AppRouter(route = "dashboard")
 
     data object CreateSubject : AppRouter(route = "create-subject")
+
+    data object ViewSection : AppRouter(route = "view-section/{sectionID}") {
+        fun createRoute(sectionID: String) = "view-section/$sectionID"
+    }
+
     data object ViewSubject : AppRouter(route = "view-subject/{subjectID}") {
         fun createRoute(subjectID: String) = "view-subject/$subjectID"
     }
@@ -97,7 +104,7 @@ sealed class AppRouter(val route : String) {
 
 
 
-    data object TeacherSubmissions : AppRouter(route = "submissions")
+    data object TeacherLeaderboard : AppRouter(route = "leaderboard")
 
 
     data object EditProfileRoute : AppRouter(route = "edit-profile/{args}") {

@@ -7,8 +7,6 @@ import com.ketchupzzz.isaom.models.subject.Subjects
 
 data class HomeState(
     val isLoading : Boolean = false,
-
-
     val error : String ? = null,
     val subjects: List<Subjects> = emptyList(),
     val users : Users ? = null,
@@ -17,4 +15,5 @@ data class HomeState(
     val translation : String ? = null,
     val source : SourceAndTargets = SourceAndTargets.ENGLISH,
     val target : SourceAndTargets = SourceAndTargets.ILOCANO,
+    val joining : Boolean = false
 )

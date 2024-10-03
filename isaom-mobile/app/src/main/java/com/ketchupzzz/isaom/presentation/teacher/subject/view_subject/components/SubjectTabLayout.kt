@@ -14,6 +14,7 @@ import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.ViewSubjec
 
 import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.activities.ActivityPage
 import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.modules.ModulePage
+import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.students.SubjectStudents
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -47,6 +48,17 @@ fun SubjectTabLayout(
                     pageState.animateScrollToPage(1)
                 }
             })
+
+        Tab(
+            selected = pageState.currentPage == 2,
+            text = {
+                Text(text = "Students")
+            },
+            onClick = {
+                scope.launch {
+                    pageState.animateScrollToPage(2)
+                }
+            })
     }
     HorizontalPager(state = pageState) {
         when(it) {
@@ -59,6 +71,7 @@ fun SubjectTabLayout(
                 events =events,
                 navHostController = navHostController
             )
+            2 -> SubjectStudents(state = state)
             else -> FullScreenNoSubject(navHostController = navHostController)
         }
     }

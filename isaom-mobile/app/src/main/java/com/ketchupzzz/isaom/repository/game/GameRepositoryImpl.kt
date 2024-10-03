@@ -1,16 +1,17 @@
 package com.ketchupzzz.isaom.repository.game
 
 import android.content.Context
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.ketchupzzz.isaom.models.Dictionary
-import com.ketchupzzz.isaom.models.GameType
-import com.ketchupzzz.isaom.models.Games
+import com.ketchupzzz.isaom.models.Users
+import com.ketchupzzz.isaom.models.games.GameType
+import com.ketchupzzz.isaom.models.games.Games
 import com.ketchupzzz.isaom.models.WordTranslate
+import com.ketchupzzz.isaom.models.games.GamesWithStudent
+import com.ketchupzzz.isaom.repository.auth.USERS_COLLECTION
 
 import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.utils.generateRandomString
@@ -18,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import retrofit2.http.Query
 import java.io.IOException
 
 class GameRepositoryImpl(
@@ -86,6 +88,32 @@ class GameRepositoryImpl(
                 "level" ,FieldValue.increment(1),
                 "score",FieldValue.increment(1)
             )
+    }
+
+    override suspend fun getGamesWithStudents(result: (UiState<List<GamesWithStudent>>) -> Unit) {
+        try {
+            result.invoke(UiState.Loading)
+
+            val gamesSnapshot = firestore.collection("games")
+                .orderBy("score", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get()
+                .await()
+
+            val gamesList = gamesSnapshot.toObjects(Games::class.java)
+            val gamesWithStudentList = mutableListOf<GamesWithStudent>()
+
+            for (game in gamesList) {
+                val studentSnapshot = firestore.collection(USERS_COLLECTION)
+                    .document(game.studentID ?: "")
+                    .get()
+                    .await()
+                val student = studentSnapshot.toObject(Users::class.java)
+                gamesWithStudentList.add(GamesWithStudent(games = game, student = student))
+            }
+            result.invoke(UiState.Success(gamesWithStudentList))
+        } catch (e: Exception) {
+            result.invoke(UiState.Error(e.message ?: "An error occurred"))
+        }
     }
 
     companion object {

@@ -13,6 +13,8 @@ import com.ketchupzzz.isaom.presentation.auth.login.LoginViewModel
 import com.ketchupzzz.isaom.presentation.auth.register.RegisterScreen
 import com.ketchupzzz.isaom.presentation.auth.register.RegisterViewModel
 import com.ketchupzzz.isaom.presentation.auth.register.gender.GenderScreen
+import com.ketchupzzz.isaom.presentation.auth.verification.VerificationScreen
+import com.ketchupzzz.isaom.presentation.auth.verification.VerificationViewModel
 
 fun NavGraphBuilder.authNavGraph(navHostController: NavHostController) {
     navigation(startDestination = AppRouter.LoginScreen.route,route = AppRouter.AuthRoutes.route) {
@@ -21,6 +23,13 @@ fun NavGraphBuilder.authNavGraph(navHostController: NavHostController) {
             val state = viewmodel.state
             val events = viewmodel::onEvent
             LoginScreen(navHostController = navHostController, state = state, events = events)
+        }
+
+        composable(route = AppRouter.VerificationScreen.route) {
+            val viewmodel = hiltViewModel<VerificationViewModel>()
+            val state = viewmodel.state
+            val events = viewmodel::events
+            VerificationScreen(navHostController = navHostController, state = state, events = events)
         }
         composable(route = AppRouter.RegisterScreen.route) {
             val viewmodel = hiltViewModel<RegisterViewModel>()

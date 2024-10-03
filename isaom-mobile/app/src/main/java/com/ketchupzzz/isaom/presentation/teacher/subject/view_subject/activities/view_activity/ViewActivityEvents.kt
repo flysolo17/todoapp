@@ -10,4 +10,8 @@ sealed interface ViewActivityEvents {
     data class OnGetQuestionByActivityID(val activityID: String) : ViewActivityEvents
     data class OnSaveQuestion(val actvityID : String,val question : Question,val uri : Uri?,val result : (UiState<String>) -> Unit) : ViewActivityEvents
     data class OnEdeleteQuestion(val activityID: String,val question: Question) : ViewActivityEvents
+    data class OnGetAllSubmissionsByActivityID(
+        val id : String,
+        val question: List<Question>
+    ) : ViewActivityEvents
 }

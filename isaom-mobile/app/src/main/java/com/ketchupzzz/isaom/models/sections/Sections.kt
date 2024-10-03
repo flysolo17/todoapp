@@ -1,4 +1,4 @@
-package com.ketchupzzz.isaom.models
+package com.ketchupzzz.isaom.models.sections
 
 import java.util.Date
 
@@ -13,7 +13,7 @@ import java.util.Date
 data class Sections(
     val id : String ? = null,
     val name : String ? = null,
-    val teacher : String ? = null,
+    val active : Boolean ? = false,
     val createdAt : Date ? = null,
     val updatedAt : Date ? = null
 )

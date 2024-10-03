@@ -55,12 +55,17 @@ import kotlinx.coroutines.delay
 fun LoginScreen(modifier: Modifier = Modifier,
                 navHostController: NavHostController,
                 state : LoginState,
-                events: (LoginEvents) -> Unit) {
+                events: (LoginEvents) -> Unit
+) {
     val context = LocalContext.current
     LaunchedEffect(state) {
         if (state.isLoggedIn) {
             Toast.makeText(context,"Successfully Logged in",Toast.LENGTH_SHORT).show()
             delay(1000)
+            if (state.users?.verified == false) {
+                navHostController.navigate(AppRouter.VerificationScreen.route)
+                return@LaunchedEffect
+            }
             if (state.users?.type === UserType.TEACHER) {
                 navHostController.navigate(AppRouter.TeacherRoutes.route)
             } else {

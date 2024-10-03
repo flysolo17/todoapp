@@ -4,8 +4,10 @@ import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
 import com.google.firebase.FirebaseException
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import com.ketchupzzz.isaom.utils.UiState
 import com.ketchupzzz.isaom.models.subject.SubjectWithModulesAndActivities
@@ -225,6 +227,68 @@ class SubjectRepositoryImpl(private val firestore: FirebaseFirestore,private val
                     result.invoke(UiState.Success(it.toObjects(Subjects::class.java)))
                 }
             }
+    }
+
+    override suspend fun getMySubjects(
+        studentID: String,
+        result: (UiState<List<Subjects>>) -> Unit,
+    ) {
+        result.invoke(UiState.Loading)
+        firestore
+            .collection(SUBJECT_COLLECTION)
+            .whereArrayContains("students",studentID)
+            .addSnapshotListener { value, error ->
+                error?.let {
+                    result.invoke(UiState.Error(it.message.toString()))
+                }
+                value?.let {
+                    result.invoke(UiState.Success(it.toObjects(Subjects::class.java)))
+                }
+            }
+    }
+
+    override suspend fun joinSubject(
+        studentID: String,
+        sections : List<String>,
+        code: String,
+        result: (UiState<String>) -> Unit,
+    ) {
+        if (sections.isEmpty()) {
+            result.invoke(UiState.Error("No Sections yet!"))
+            return
+        }
+        val subjects = firestore
+            .collection(SUBJECT_COLLECTION)
+            .whereIn("id",sections)
+            .whereEqualTo("code",code)
+            .get()
+            .await()
+            .toObjects<Subjects>()
+        if (subjects.isEmpty()) {
+            result.invoke(UiState.Error("No Subject Found!"))
+            return
+        }
+        subjects.forEach {
+            if (it.students.contains(studentID)) {
+                result.invoke(UiState.Success("You already joined the subject"))
+                return
+            }
+        }
+        val subject = subjects.first()
+
+        firestore.collection(SUBJECT_COLLECTION).document(subject.id!!)
+            .update("students",FieldValue.arrayUnion(studentID))
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    result.invoke(UiState.Success("Successfully Added"))
+                } else {
+                    result.invoke(UiState.Error("Unknown Error"))
+                }
+            }.addOnFailureListener {
+                result.invoke(UiState.Error(it.message.toString()))
+            }
+
+
     }
 
     companion object {

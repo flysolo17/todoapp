@@ -24,6 +24,7 @@ import com.ketchupzzz.isaom.presentation.main.subject.activities.StudentActivity
 import com.ketchupzzz.isaom.presentation.main.subject.modules.StudentModuleScreen
 import com.ketchupzzz.isaom.presentation.main.subject.submissions.StudentSubmissionsScreen
 import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.components.SubjectHeader
+import com.ketchupzzz.isaom.utils.ProgressBar
 import com.ketchupzzz.isaom.utils.UnknownError
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -34,82 +35,109 @@ import kotlinx.coroutines.launch
 @Composable
 fun StudentViewSubjectScreen(
     modifier: Modifier = Modifier,
-    subjects: Subjects,
+    subjectID : String,
     state : StudentViewSubjectState,
     event: (StudentViewSubjectEvent) -> Unit,
     navHostController: NavHostController
 ) {
-    LaunchedEffect(subjects) {
-        if (!subjects.id.isNullOrEmpty()) {
-            event.invoke(StudentViewSubjectEvent.OnGetSubjectModules(subjects.id))
-            event.invoke(StudentViewSubjectEvent.OnGetSubjectActivities(subjects.id))
-            Log.d("view","modules")
-            Log.d("view","activity")
+    LaunchedEffect(
+        subjectID
+    ) {
+        if (subjectID.isNotEmpty()) {
+            event.invoke(StudentViewSubjectEvent.OnGetSubject(subjectID))
         }
-
     }
+
+
     val pageState = rememberPagerState(0) { 3}
     val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
-            StudentSubjectheader(subjects = subjects, state = state, event = event) {
-                navHostController.popBackStack()
+            if (state.subject != null) {
+                StudentSubjectheader(subjects = state.subject, state = state, event = event) {
+                    navHostController.popBackStack()
+                }
             }
+
         }
-    ) {
+    ) { it ->
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(it)
                 .padding(8.dp)
         ) {
-            TabRow(selectedTabIndex = pageState.currentPage) {
-                SubjectTabs(title = "Modules", isSelected = pageState.currentPage == 0) {
-                    scope.launch {
-                        pageState.animateScrollToPage(0)
+            when {
+                state.isLoading -> ProgressBar(
+                    title = "Getting Subject data..."
+                )
+                state.errors != null && state.subject == null -> UnknownError(
+                    title = "${state.errors}"
+                ) {
+                    Button(onClick = { navHostController.popBackStack() }) {
+                        Text(text = "Back")
                     }
-                }
-                SubjectTabs(title = "Activities", isSelected = pageState.currentPage == 1) {
-                    scope.launch {
-                        pageState.animateScrollToPage(1)
-                    }
-                }
+                } else -> {
+                    val subjects = state.subject 
+                if (subjects != null) {
+                    TabRow(selectedTabIndex = pageState.currentPage) {
+                        SubjectTabs(title = "Modules", isSelected = pageState.currentPage == 0) {
+                            scope.launch {
+                                pageState.animateScrollToPage(0)
+                            }
+                        }
+                        SubjectTabs(title = "Activities", isSelected = pageState.currentPage == 1) {
+                            scope.launch {
+                                pageState.animateScrollToPage(1)
+                            }
+                        }
 
-                SubjectTabs(title = "Submissions", isSelected = pageState.currentPage == 2) {
-                    scope.launch {
-                        pageState.animateScrollToPage(2)
+                        SubjectTabs(title = "Submissions", isSelected = pageState.currentPage == 2) {
+                            scope.launch {
+                                pageState.animateScrollToPage(2)
+                            }
+                        }
                     }
-                }
-            }
-            HorizontalPager(state = pageState) {
-                when (it) {
-                    0 -> {
-                        StudentModuleScreen(
-                            state = state,
-                            navHostController = navHostController
-                        )
-                    }
-                    1 -> {
-                        StudentActivityScreen(
-                            state = state,
-                            navHostController = navHostController
-                        )
-                    }
-                    2 -> {
-                        StudentSubmissionsScreen(
-                            state = state,
-                            navHostController = navHostController
-                        )
-                    }
-                    else -> {
-                        UnknownError(
-                            title = "Unknown Error"
-                        ) {
-                            Button(onClick = { navHostController.popBackStack() }) { Text(text = "Back") }
+                    HorizontalPager(state = pageState) {
+                        when (it) {
+                            0 -> {
+                                StudentModuleScreen(
+                                    state = state,
+                                    events = event,
+                                    subjects = subjects,
+                                    navHostController = navHostController
+                                )
+                            }
+                            1 -> {
+                                StudentActivityScreen(
+                                    state = state,
+                                    subjects = subjects,
+                                    events = event,
+                                    navHostController = navHostController
+                                )
+                            }
+                            2 -> {
+                                StudentSubmissionsScreen(
+                                    state = state,
+                                    events = event,
+                                    subjects = subjects,
+                                    navHostController = navHostController
+                                )
+                            }
+                            else -> {
+                                UnknownError(
+                                    title = "Unknown Error"
+                                ) {
+                                    Button(onClick = { navHostController.popBackStack() }) { Text(text = "Back") }
+                                }
+                            }
                         }
                     }
                 }
+                }
             }
+
+
         }
     }
 

@@ -1,5 +1,6 @@
 package com.ketchupzzz.isaom.presentation.main.subject.activities.view
 
+import com.ketchupzzz.isaom.models.subject.activities.Activity
 
 
 sealed interface StudentViewActivityEvents  {
@@ -7,5 +8,7 @@ sealed interface StudentViewActivityEvents  {
         val activityID : String
     )   : StudentViewActivityEvents
 
-    data class OnUpdateAnswers(val answer : String,val index : Int) : StudentViewActivityEvents
+    data class OnUpdateAnswers(val questionID : String , val answer : String) : StudentViewActivityEvents
+
+    data class OnSubmitAnswer(val activity : Activity) : StudentViewActivityEvents
 }

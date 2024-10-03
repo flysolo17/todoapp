@@ -47,7 +47,12 @@ class LoginViewModel @Inject constructor(
                 }
                 is UiState.Success -> {
                     authRepository.setUser(it.data)
-                    state.copy(isLoading = false, isLoggedIn = true, error = null, users = it.data)
+                    state.copy(
+                        isLoading = false,
+                        isLoggedIn = true,
+                        error = null,
+                        users = it.data
+                    )
                 }
             }
         }
