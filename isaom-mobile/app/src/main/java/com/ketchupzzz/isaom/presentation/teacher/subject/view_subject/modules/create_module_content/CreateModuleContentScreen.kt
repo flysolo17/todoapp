@@ -114,15 +114,7 @@ fun CreateModuleContentScreen(
                 label = { Text(text = "Enter Title")},
                 isError = false,
             )
-            Spacer(modifier = modifier.height(16.dp))
-            TextField(
-                modifier = modifier.fillMaxWidth(),
-                value = state.desc,
-                onValueChange = {events.invoke(CreateModuleScreenEvents.OnDescChange(it))},
-                label = { Text(text = "Enter Description")},
-                isError = false,
-                minLines = 2
-            )
+
             Spacer(modifier = modifier.height(16.dp))
             Text(text = "Content Body", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = modifier.height(8.dp))

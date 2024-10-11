@@ -88,7 +88,12 @@ fun BottomNavBar(
                             )
                         }
                     }
-                }, label = { Text(text = destinations.label) }
+                }, label = {
+                    if (isSelected) {
+                        Text(text = destinations.label, fontSize = 8.sp)
+                    }
+
+                }
             )
         }
     }

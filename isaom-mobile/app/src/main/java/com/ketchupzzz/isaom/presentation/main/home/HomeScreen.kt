@@ -111,7 +111,6 @@ fun HomeScreen(
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
-
         item {
             Column(
                 modifier = modifier
@@ -214,11 +213,6 @@ fun FeaturesLayout(
                     shape = RoundedCornerShape(0.dp),
                     onClick = {
                         navHostController.navigate(AppRouter.TranslatorScreen.route) {
-                            popUpTo(navHostController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
                         }
                     },
                     modifier = modifier

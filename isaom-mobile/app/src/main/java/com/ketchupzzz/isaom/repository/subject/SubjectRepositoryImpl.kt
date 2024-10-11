@@ -257,9 +257,10 @@ class SubjectRepositoryImpl(private val firestore: FirebaseFirestore,private val
             result.invoke(UiState.Error("No Sections yet!"))
             return
         }
+
         val subjects = firestore
             .collection(SUBJECT_COLLECTION)
-            .whereIn("id",sections)
+            .whereIn("sectionID",sections)
             .whereEqualTo("code",code)
             .get()
             .await()

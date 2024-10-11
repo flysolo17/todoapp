@@ -77,7 +77,7 @@ fun GenderScreen(
 
 
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 128.dp),
+            columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(4.dp),
             userScrollEnabled = true // Enable scrolling if needed

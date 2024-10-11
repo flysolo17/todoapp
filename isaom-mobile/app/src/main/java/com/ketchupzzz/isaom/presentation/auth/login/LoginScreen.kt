@@ -3,6 +3,7 @@ package com.ketchupzzz.isaom.presentation.auth.login
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,10 +19,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,6 +54,7 @@ import com.ketchupzzz.isaom.R
 import com.ketchupzzz.isaom.models.UserType
 import com.ketchupzzz.isaom.presentation.routes.AppRouter
 import com.ketchupzzz.isaom.ui.custom.PrimaryButton
+import com.ketchupzzz.isaom.utils.toast
 import kotlinx.coroutines.delay
 
 @Composable
@@ -184,6 +190,23 @@ fun LoginForm(modifier: Modifier = Modifier, navHostController: NavHostControlle
             }
 
 
+            val context = LocalContext.current
+            OutlinedButton(
+                shape = RoundedCornerShape(8.dp),
+                modifier = modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                   containerColor = Color(0xFFFF6600),
+                    contentColor = Color.White
+
+                ),
+                onClick = { context.toast("Not implemented yet")
+            }) {
+                Text(
+                    text = "Login as Guest",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
         }
 
     }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import com.ketchupzzz.isaom.presentation.main.dictionary.words.FavoriteScreen
 import com.ketchupzzz.isaom.presentation.main.dictionary.words.WordsScreen
 import kotlinx.coroutines.launch
 
@@ -33,39 +34,46 @@ fun DictionaryScreen(modifier: Modifier = Modifier,
         }
     }
     Column(modifier = modifier.fillMaxSize()) {
-        val pageState = rememberPagerState(pageCount = {2})
-        val scope  = rememberCoroutineScope()
-        TabRow(selectedTabIndex = pageState.currentPage) {
-            Tab(
-                selected = pageState.currentPage == 0,
-                text = {
-                    Text(text = "Dictionary")
-                },
-                onClick = {
-                scope.launch {
-                    pageState.animateScrollToPage(0)
-                }
-            })
-            Tab(
-                selected = pageState.currentPage == 1,
-                text = {
-                    Text(text = "Favorites")
-                },
-                onClick = {
-                    scope.launch {
-                        pageState.animateScrollToPage(1)
-                    }
-                })
-        }
+        if (state.users == null) {
+            WordsScreen(state = state, events = events, dictionaryList = state.dictionaryList)
+        } else {
+            val pageState = rememberPagerState(pageCount = {2})
+            val scope  = rememberCoroutineScope()
+            TabRow(selectedTabIndex = pageState.currentPage) {
+                Tab(
+                    selected = pageState.currentPage == 0,
+                    text = {
+                        Text(text = "Dictionary")
+                    },
+                    onClick = {
+                        scope.launch {
+                            pageState.animateScrollToPage(0)
+                        }
+                    })
+                Tab(
+                    selected = pageState.currentPage == 1,
+                    text = {
+                        Text(text = "Favorites")
+                    },
+                    onClick = {
+                        scope.launch {
+                            pageState.animateScrollToPage(1)
+                        }
+                    })
+            }
 
-        HorizontalPager(state = pageState) {page ->
-            if (page == 0) {
-                WordsScreen(state = state, events = events, dictionaryList = state.dictionaryList)
-            } else {
-                WordsScreen(state = state, events = events, dictionaryList = state.favorites)
+            HorizontalPager(state = pageState) {page ->
+                if (page == 0) {
+                    WordsScreen(state = state, events = events, dictionaryList = state.dictionaryList)
+                } else {
+                    FavoriteScreen(
+                        state = state,
+                        events = events
+                    )
+                }
             }
         }
 
-    }
 
+    }
 }

@@ -100,29 +100,6 @@ fun AccountTypeScreen(
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleMedium
                 )
-
-
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        ElevatedCard(
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 6.dp
-            ),
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFFF6600),  contentColor = Color.White),
-            modifier = modifier
-                .fillMaxWidth()
-                .clickable {
-                    accountType.invoke(UserType.GUEST)
-                }
-        ) {
-            Text(
-                text = "Guest",
-                modifier = Modifier.fillMaxWidth()
-                    .padding(16.dp),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleMedium
-            )
         }
     }
 }

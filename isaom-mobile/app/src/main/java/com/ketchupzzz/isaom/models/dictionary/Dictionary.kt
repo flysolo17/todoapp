@@ -1,8 +1,4 @@
-package com.ketchupzzz.isaom.models
-
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
+package com.ketchupzzz.isaom.models.dictionary
 
 
 data class Dictionary(
@@ -11,5 +7,4 @@ data class Dictionary(
     val link : String ? = null,
     val definition : String ? = null,
     val language:String ? = null,
-    val favorite : Boolean ? = null,
 )

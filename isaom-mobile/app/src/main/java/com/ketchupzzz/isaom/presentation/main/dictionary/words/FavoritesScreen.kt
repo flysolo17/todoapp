@@ -1,8 +1,5 @@
 package com.ketchupzzz.isaom.presentation.main.dictionary.words
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,55 +29,53 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.ketchupzzz.isaom.R
-import com.ketchupzzz.isaom.models.dictionary.Dictionary
 import com.ketchupzzz.isaom.models.dictionary.Favorites
 import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryEvents
 import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryState
 import com.ketchupzzz.isaom.ui.custom.WebViewDialog
 import com.ketchupzzz.isaom.utils.generateRandomString
 
-    @Composable
-    fun WordsScreen(
-        modifier: Modifier = Modifier,
-        state : DictionaryState,
-        events: (DictionaryEvents) -> Unit,
-        dictionaryList : List<Dictionary>
-    ) {
-        val context = LocalContext.current
-        if (state.isLoading) {
-            Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator()
-                Text(text = "Loading.....")
-            }
-        } else {
-            LazyColumn(
-                modifier =  modifier.fillMaxSize()
-            ) {
-                val dictIDs = state.favorites.map { it.dictionary?.id ?:"" }
-                val filteredWords = dictionaryList.filter { !dictIDs.contains(it.id) }
-                items(filteredWords, key = {it.id ?: generateRandomString() }) {
-                    val isEnabled = state.users  != null
-                    WordCard(dictionary = it, events = events, isButtonEnable = isEnabled)
+
+@Composable
+fun FavoriteScreen(modifier: Modifier = Modifier,
+                   state : DictionaryState,
+                   events: (DictionaryEvents) -> Unit
+) {
+    val context = LocalContext.current
+    if (state.isLoading) {
+        Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator()
+            Text(text = "Loading.....")
+        }
+    } else {
+        LazyColumn(
+            modifier =  modifier.fillMaxSize()
+        ) {
+            items(state.favorites, key = { it.id }) {
+                FavoritesCard(favorites = it) {
+                    events.invoke(DictionaryEvents.RemoveToFavorites(it.id, context = context))
                 }
+
             }
         }
     }
-
-
+}
 
 @Composable
-fun WordCard(
+fun FavoritesCard(
     modifier: Modifier = Modifier,
-    dictionary: Dictionary,
-    events: (DictionaryEvents) -> Unit,
-    isButtonEnable : Boolean = false,
+    favorites: Favorites,
+    onRemoved : () -> Unit
 ) {
     var isShowDialog by remember { mutableStateOf(false) }
     if (isShowDialog) {
-        WebViewDialog(dictionary = dictionary) {
-            isShowDialog = !isShowDialog
+        favorites?.dictionary?.let {
+            WebViewDialog(dictionary = it) {
+                isShowDialog = !isShowDialog
+            }
         }
     }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -95,29 +90,20 @@ fun WordCard(
                     .fillMaxWidth()
                     .weight(1f), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(text = "English" , color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.labelSmall)
-                    Text(text = dictionary.word ?: "No Word" , color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.titleMedium)
+                    Text(text = favorites.dictionary?.word ?: "No Word" , color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.titleMedium)
                 }
 
-                if (isButtonEnable) {
-                    IconButton(onClick = { events(DictionaryEvents.OnAddToFavorites(dictionary)) }) {
-                        Icon(painter = painterResource(id = R.drawable.baseline_star_outline_24), contentDescription = "Not Liked")
-
-                    }
+                IconButton(onClick = { onRemoved() }) {
+                    Icon(painter = painterResource(id = R.drawable.baseline_star_24), contentDescription = "Not Liked")
                 }
+
             }
 
             Spacer(modifier = modifier.height(2.dp))
             HorizontalDivider()
             Spacer(modifier = modifier.height(2.dp))
             Text(text = "Ilocano" , color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.labelSmall)
-            Text(text = dictionary.definition ?: "No Definition" , color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.titleMedium)
+            Text(text = favorites.dictionary?.definition ?: "No Definition" , color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.titleMedium)
         }
     }
-}
-
-fun openLink(context: Context, url: String) {
-    val intent = Intent(Intent.ACTION_VIEW).apply {
-        data = Uri.parse(url)
-    }
-    context.startActivity(intent)
 }

@@ -46,7 +46,7 @@ fun MainScreen(modifier: Modifier = Modifier, mainNav: NavHostController) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(text = destination.toString()) },
+                    title = { Text(text = destination.toString().replace("Lessons","Sign Language")) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,

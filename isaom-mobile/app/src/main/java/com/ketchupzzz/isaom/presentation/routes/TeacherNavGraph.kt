@@ -14,10 +14,17 @@ import com.ketchupzzz.isaom.presentation.auth.change_password.ChangePasswordScre
 import com.ketchupzzz.isaom.presentation.auth.change_password.ChangePasswordViewModel
 import com.ketchupzzz.isaom.presentation.auth.edit_profile.EditProfileScreen
 import com.ketchupzzz.isaom.presentation.auth.edit_profile.EditProfileViewModel
+import com.ketchupzzz.isaom.presentation.main.about.AboutScreen
+import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryScreen
+import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryViewModel
 import com.ketchupzzz.isaom.presentation.main.home.HomeScreen
 import com.ketchupzzz.isaom.presentation.main.home.HomeViewModel
+import com.ketchupzzz.isaom.presentation.main.lessons.LessonScreen
+import com.ketchupzzz.isaom.presentation.main.lessons.LessonViewModel
 import com.ketchupzzz.isaom.presentation.main.profle.ProfileScreen
 import com.ketchupzzz.isaom.presentation.main.profle.ProfileViewModel
+import com.ketchupzzz.isaom.presentation.main.translator.TranslatorScreen
+import com.ketchupzzz.isaom.presentation.main.translator.TranslatorViewModel
 import com.ketchupzzz.isaom.presentation.teacher.SubmissionScreen
 import com.ketchupzzz.isaom.presentation.teacher.subject.add_subject.CreateSubjectScreen
 import com.ketchupzzz.isaom.presentation.teacher.subject.add_subject.SubjectViewModel
@@ -67,6 +74,21 @@ fun TeacherNavGraph(
                 state = viewModel.state,
                 events = viewModel::events,
             )
+        }
+        composable(route = AppRouter.AboutScreen.route) {
+            AboutScreen(navHostController= navHostController)
+        }
+        composable(route = AppRouter.Lessons.route) {
+            val viewModel = hiltViewModel<LessonViewModel>()
+            LessonScreen(navHostController = navHostController, state = viewModel.state, events = viewModel::events )
+        }
+        composable(route = AppRouter.TranslatorScreen.route) {
+            val viewModel = hiltViewModel<TranslatorViewModel>()
+            TranslatorScreen(state = viewModel.state, events = viewModel::events)
+        }
+        composable(route = AppRouter.Dictionary.route) {
+            val viewModel = hiltViewModel<DictionaryViewModel>()
+            DictionaryScreen(navHostController = navHostController, state = viewModel.state, events = viewModel::events )
         }
         composable(route = AppRouter.ViewSection.route) {
             val viewModel = hiltViewModel<ViewSectionViewModel>()

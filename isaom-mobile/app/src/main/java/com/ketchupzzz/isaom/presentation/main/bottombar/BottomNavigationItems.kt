@@ -1,6 +1,7 @@
 package com.ketchupzzz.isaom.presentation.main.bottombar
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import com.ketchupzzz.isaom.R
@@ -15,7 +16,29 @@ data class BottomNavigationItems(
     val route : String
 ) {
     companion object {
-
+        val GUEST_ITEMS = listOf(
+            BottomNavigationItems(
+                label = "Dictionary",
+                selectedIcon = R.drawable.home_filled,
+                unselectedIcon = R.drawable.home_outlined,
+                hasNews = false,
+                route = AppRouter.TeacherDashboard.route
+            ),
+            BottomNavigationItems(
+                label = "Sign Language",
+                selectedIcon = R.drawable.video_solid,
+                unselectedIcon = R.drawable.video_solid,
+                hasNews = false,
+                route = AppRouter.Lessons.route
+            ),
+            BottomNavigationItems(
+                label = "About",
+                selectedIcon = R.drawable.about_filled,
+                unselectedIcon = R.drawable.about_outline,
+                hasNews = false,
+                route = AppRouter.AboutScreen.route
+            ),
+        )
         val TEACHER_ITEMS : List<BottomNavigationItems> = listOf(
             BottomNavigationItems(
                 label = "Dashboard",
@@ -25,11 +48,19 @@ data class BottomNavigationItems(
                 route = AppRouter.TeacherDashboard.route
             ),
             BottomNavigationItems(
-                label = "Leaderboard",
-                selectedIcon = R.drawable.file_text,
-                unselectedIcon = R.drawable.file_text_filled,
+                label = "Dictionary",
+                selectedIcon = R.drawable.book_selected,
+                unselectedIcon = R.drawable.book_unselected,
                 hasNews = false,
-                route = AppRouter.TeacherLeaderboard.route
+                route = AppRouter.Dictionary.route
+            ),
+
+            BottomNavigationItems(
+                label = "About",
+                selectedIcon = R.drawable.about_filled,
+                unselectedIcon = R.drawable.about_outline,
+                hasNews = false,
+                route = AppRouter.AboutScreen.route
             ),
             BottomNavigationItems(
                 label = "Profile",
@@ -57,7 +88,7 @@ data class BottomNavigationItems(
                 route = AppRouter.Dictionary.route
             ),
             BottomNavigationItems(
-                label = "Lessons",
+                label = "Sign Language",
                 selectedIcon = R.drawable.video_solid,
                 unselectedIcon = R.drawable.video_solid,
                 hasNews = false,
