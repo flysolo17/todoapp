@@ -30,12 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.ketchupzzz.isaom.presentation.main.home.CameraButton
-import com.ketchupzzz.isaom.presentation.main.home.HomeEvents
-import com.ketchupzzz.isaom.presentation.main.home.HomeState
-
 import com.ketchupzzz.isaom.ui.custom.IsaomDropdownMenu
 import com.ketchupzzz.isaom.ui.custom.PrimaryButton
+import com.ketchupzzz.isaom.utils.CameraButton
 
 
 fun copyToClipboard(context: Context, text: String) {

@@ -8,5 +8,6 @@ import dagger.hilt.android.HiltAndroidApp
 class IsaomApp : Application() {
     override fun onCreate() {
         super.onCreate()
+
     }
 }

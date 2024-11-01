@@ -3,7 +3,6 @@ package com.ketchupzzz.isaom.presentation.main.translator
 import android.content.Context
 import android.net.Uri
 import com.ketchupzzz.isaom.models.SourceAndTargets
-import com.ketchupzzz.isaom.presentation.main.home.HomeEvents
 
 
 sealed interface TranslatorEvents  {

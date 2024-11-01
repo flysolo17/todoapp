@@ -14,6 +14,8 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class ActivityRepositoryImpl(private val firestore: FirebaseFirestore,private val storage : FirebaseStorage): ActivityRepository {
+
+
     override fun createActivity(activity: Activity, result: (UiState<String>) -> Unit) {
         result.invoke(UiState.Loading)
         firestore.collection(ACTIVITY_COLLECTION)
@@ -29,6 +31,7 @@ class ActivityRepositoryImpl(private val firestore: FirebaseFirestore,private va
                 result.invoke(UiState.Error(it.message.toString()))
             }
     }
+
 
     override suspend fun getActivityByID(id: String, result: (UiState<Activity?>) -> Unit) {
         result.invoke(UiState.Loading)

@@ -72,11 +72,12 @@ fun RegisterScreen(
     state: RegisterState,
     events: (RegisterEvents) -> Unit
 ) {
-    val context = LocalContext.current
+
     val onBoardingState = rememberPagerState(0,0F) {
         3
     }
 
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(state) {
         if (state.registerSuccess) {

@@ -5,14 +5,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.ketchupzzz.isaom.models.GenderSelection
 import com.ketchupzzz.isaom.presentation.auth.forgotPassword.ForgotPasswordScreen
 import com.ketchupzzz.isaom.presentation.auth.forgotPassword.ForgotPasswordViewModel
 import com.ketchupzzz.isaom.presentation.auth.login.LoginScreen
 import com.ketchupzzz.isaom.presentation.auth.login.LoginViewModel
 import com.ketchupzzz.isaom.presentation.auth.register.RegisterScreen
 import com.ketchupzzz.isaom.presentation.auth.register.RegisterViewModel
-import com.ketchupzzz.isaom.presentation.auth.register.gender.GenderScreen
 import com.ketchupzzz.isaom.presentation.auth.verification.VerificationScreen
 import com.ketchupzzz.isaom.presentation.auth.verification.VerificationViewModel
 

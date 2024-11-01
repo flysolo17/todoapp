@@ -12,8 +12,7 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.ketchupzzz.isaom.models.SourceAndTargets
 import com.ketchupzzz.isaom.models.history.TranslatorHistory
-import com.ketchupzzz.isaom.presentation.main.home.HomeEvents
-import com.ketchupzzz.isaom.presentation.main.home.HomeState
+
 import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.repository.translator.TranslatorRepository
 import com.ketchupzzz.isaom.utils.UiState

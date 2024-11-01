@@ -17,6 +17,7 @@ class TranslatorRepositoryImpl(
     private  val translatorService: TranslatorService,
     private val firestore: FirebaseFirestore
 ): TranslatorRepository {
+
     override fun translateText(
         text: String,
         source : String,
@@ -48,7 +49,6 @@ class TranslatorRepositoryImpl(
             }
 
             override fun onFailure(call: retrofit2.Call<TranslationResponse>, t: Throwable) {
-
                 result(UiState.Error("Network error: ${t.message}"))
             }
         })

@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.ketchupzzz.isaom.models.dictionary.Dictionary
+import com.ketchupzzz.isaom.models.dictionary.remote.Dictionary
 
 
 @OptIn(ExperimentalMaterial3Api::class)

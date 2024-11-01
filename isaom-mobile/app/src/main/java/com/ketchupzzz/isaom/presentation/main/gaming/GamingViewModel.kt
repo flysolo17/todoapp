@@ -1,102 +1,144 @@
 package com.ketchupzzz.isaom.presentation.main.gaming
 
+import android.os.CountDownTimer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ketchupzzz.isaom.models.WordTranslate
-import com.ketchupzzz.isaom.models.init
-
+import androidx.navigation.NavHostController
+import com.ketchupzzz.isaom.models.games.GameSubmission
+import com.ketchupzzz.isaom.models.games.Games
+import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.repository.game.GameRepository
 import com.ketchupzzz.isaom.utils.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Timer
+import java.util.TimerTask
 import javax.inject.Inject
 
 
 @HiltViewModel
-
 class GamingViewModel @Inject constructor(
-     private val gameRepository: GameRepository
+    private  val gameRepository: GameRepository,
 ) : ViewModel() {
     var state by mutableStateOf(GamingState())
 
-    init {
-        events(GamingEvents.OnGetStudentLeaderboard)
-    }
-    fun events(e : GamingEvents) {
+    fun events(e :GamingEvents) {
         when(e) {
-            GamingEvents.OnGetStudentLeaderboard -> getGameData()
-            is GamingEvents.OnAddAnswer -> addAnswer(e.answer,e.index)
-            GamingEvents.OnReset -> state = state.copy(
-                answer = "",
-               shuffledChoices =  state.level.ilocano.toList().shuffled()
+            is GamingEvents.OnGetLevels -> getLevels(e.game)
+            is GamingEvents.OnSetUsers -> state = state.copy(
+                users = e.users
             )
-        }
-    }
-
-    private fun addAnswer(ans: Char, index: Int) {
-        val answer = (state.answer + ans).lowercase()
-        val correctAns = state.level.ilocano.lowercase()
-
-        if (answer == correctAns) {
-            viewModelScope.launch {
-                gameRepository.updateGame(gameID = state.games?.id ?: "")
+            is GamingEvents.OnStartTimer -> startTimer(e.time)
+            is GamingEvents.OnAnswerChanged -> addAnswer(e.text,e.index)
+            GamingEvents.OnReset -> reset()
+            is GamingEvents.OnAddAnser -> saveAnswer(e.answers)
+            is GamingEvents.OnFinish -> submitGame(e.gameSubmission,e.navHostController)
+            is GamingEvents.OnIncrementScore -> {
+                val currentScore = state.score + e.points
+                state = state.copy(score = currentScore)
             }
-            return
-        }
-
-        if (answer.length < correctAns.length) {
-            val newShuffledChoices = state.shuffledChoices.toMutableList()
-            newShuffledChoices.removeAt(index)
-            state = state.copy(
-                answer = answer,
-                shuffledChoices = newShuffledChoices
-            )
-        } else {
-            val choices = state.level.ilocano.toList().shuffled()
-            state = state.copy(
-                answer = "",
-                shuffledChoices = choices
-            )
         }
     }
 
-
-    private fun getGameData() {
-        state = state.copy(
-            words = WordTranslate(english = "Goodmorning", ilocano = "Naimbag a bigat").init()
-        )
+    private fun submitGame(gameSubmission: GameSubmission,navHostController: NavHostController) {
         viewModelScope.launch {
-            gameRepository.getLeaderboard {
-                state = when(it) {
-                    is UiState.Error -> state.copy(
-                        isLoading = false,
+            gameRepository.submitScore(gameSubmission) {
+              when(it) {
+                    is UiState.Error ->   state = state.copy(
+                        isSubmitting = false,
                         errors = it.message
                     )
-                    UiState.Loading -> state.copy(
-                        isLoading = true,
-                        errors = null
+                    UiState.Loading ->   state = state.copy(
+                        isSubmitting = true,
+                        errors = null,
                     )
                     is UiState.Success -> {
-                        val currentLevel = state.words[it.data.level]
-                        val choices = currentLevel.ilocano.toList().shuffled().shuffled()
-                        state.copy(
-                            isLoading = false,
-                            games = it.data,
-                            answer = "",
-                            level = currentLevel,
-                            shuffledChoices =choices
+                        state = state.copy(
+                            isSubmitting = false,
+                            errors = null,
+                            submitted = it.data
                         )
+                        navHostController.popBackStack()
                     }
                 }
             }
         }
     }
 
-}
+    private fun saveAnswer(answers: Pair<String, String>) {
+        state = state.copy(
+            answerSheet = state.answerSheet + answers
+        )
+    }
 
-fun List<Char>.toMapList(): List<Map<Int, Char>> {
-    return this.mapIndexed { index, char -> mapOf(index to char) }
+    private fun reset() {
+        state = state.copy(
+            answers = "",
+            answerIndex = emptyList()
+        )
+    }
+
+    private fun addAnswer(text: String, index: Int) {
+        val current = state.answerIndex.toMutableList()
+        current.add(index)
+        state = state.copy(
+            answers = state.answers + text,
+            answerIndex = current
+        )
+    }
+
+    private var countDownTimer: CountDownTimer? = null
+
+    private fun startTimer(time: Int) {
+        countDownTimer?.cancel() // Cancel any previous timer to avoid multiple timers running
+        val timeInMillis = time * 60 * 1000
+        countDownTimer = object : CountDownTimer(timeInMillis.toLong(), 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                state = state.copy(timer = (millisUntilFinished / 1000).toInt())
+            }
+
+            override fun onFinish() {
+                state = state.copy(timer = 0, timerFinish = true)
+                println("Timer finished")
+            }
+        }
+        countDownTimer?.start()
+    }
+
+
+
+
+
+    private fun getLevels(games: Games) {
+        viewModelScope.launch {
+
+            gameRepository.getAllLevels(games.id!!) {
+                state = when(it) {
+                    is UiState.Error -> state.copy(
+                        isLoading = false,
+                        errors = it.message
+                    )
+                    is UiState.Loading -> state.copy(
+                        isLoading = true,
+                        errors = null
+                    )
+                    is UiState.Success -> {
+
+                        state.copy(
+                            isLoading = false,
+                            errors = null,
+                            levels = it.data,
+                            timer = 0
+                        )
+                    }
+                }
+                events(GamingEvents.OnStartTimer(games.timer))
+            }
+        }
+    }
 }

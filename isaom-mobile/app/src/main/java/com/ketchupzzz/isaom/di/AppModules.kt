@@ -2,9 +2,12 @@ package com.ketchupzzz.isaom.di
 
 
 import android.content.Context
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+
+import com.ketchupzzz.isaom.repository.submission.SubmissionRepositoryImpl
 import com.ketchupzzz.isaom.repository.activity.ActivityRepository
 import com.ketchupzzz.isaom.repository.activity.ActivityRepositoryImpl
 import com.ketchupzzz.isaom.repository.dictionary.DictionaryRepository
@@ -21,8 +24,8 @@ import com.ketchupzzz.isaom.repository.sections.SectionRepository
 import com.ketchupzzz.isaom.repository.sections.SectionRepositoryImpl
 import com.ketchupzzz.isaom.repository.subject.SubjectRepository
 import com.ketchupzzz.isaom.repository.subject.SubjectRepositoryImpl
-import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.submissions.SubmissionRepository
-import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.submissions.SubmissionRepositoryImpl
+import com.ketchupzzz.isaom.repository.submission.SubmissionRepository
+
 import com.ketchupzzz.isaom.repository.translator.TranslatorRepository
 import com.ketchupzzz.isaom.repository.translator.TranslatorRepositoryImpl
 import com.ketchupzzz.isaom.services.TranslatorService
@@ -37,10 +40,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
     @Provides
     @Singleton
     fun provideAuthRepository(
@@ -62,7 +65,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDictionaryRepository(
-
         firestore: FirebaseFirestore
     ) : DictionaryRepository {
         return DictionaryRepositoryImpl(firestore)

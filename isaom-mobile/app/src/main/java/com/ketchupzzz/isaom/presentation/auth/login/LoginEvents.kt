@@ -5,7 +5,5 @@ sealed interface LoginEvents {
     data class OnPasswordChanged(val password: String) : LoginEvents
     data object OnTogglePasswordVisibility : LoginEvents
     data object OnLogin : LoginEvents
-
     data object OnGetCurrentUser : LoginEvents
-
 }

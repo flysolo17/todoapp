@@ -6,13 +6,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
+import com.ketchupzzz.isaom.models.Users
 import com.ketchupzzz.isaom.utils.UiState
-import com.ketchupzzz.isaom.models.dictionary.Dictionary
-import com.ketchupzzz.isaom.models.dictionary.Favorites
+import com.ketchupzzz.isaom.models.dictionary.remote.Dictionary
+import com.ketchupzzz.isaom.models.dictionary.remote.Favorites
 import com.ketchupzzz.isaom.repository.auth.AuthRepository
 import com.ketchupzzz.isaom.repository.dictionary.DictionaryRepository
 import com.ketchupzzz.isaom.utils.toast
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,16 +31,7 @@ class DictionaryViewModel @Inject constructor(
     var state by mutableStateOf(DictionaryState())
     init {
         events(DictionaryEvents.OnGetAllDictionaries)
-        authRepository.getCurrentUser { result ->
-            if (result is UiState.Success) {
-                state = state.copy(
-                    users = result.data
-                )
-                if (result.data != null) {
-                    events(DictionaryEvents.OnGetDictionary(result.data.id ?: ""))
-                }
-            }
-        }
+
     }
     fun events(events: DictionaryEvents) {
         when(events) {
@@ -42,7 +39,31 @@ class DictionaryViewModel @Inject constructor(
             is DictionaryEvents.OnAddToFavorites -> addToFavorites(events.dictionary)
             is DictionaryEvents.OnGetDictionary -> getFavorites(events.uid)
             is DictionaryEvents.RemoveToFavorites -> removeFavorite(events.id,events.context)
+            is DictionaryEvents.OnGetUsers -> setUser(events.users)
+            is DictionaryEvents.OnSearching -> searching(events.text)
         }
+    }
+
+    private fun searching(text: String) {
+//        val filtered = if (text.isEmpty()) {
+//            state.words
+//        } else {
+//            state.dictionaryList.filter {
+//                it.word?.contains(text, ignoreCase = true) == true ||
+//                        it.definition?.contains(text, ignoreCase = true) == true
+//            }
+//        }
+//        state = state.copy(
+//            dictionaryList = filtered,
+//            filter = text
+//        )
+    }
+
+    private fun setUser(users: Users?) {
+
+        state = state.copy(
+            users= users
+        )
     }
 
     private fun removeFavorite(id: String,context: Context) {
@@ -116,31 +137,11 @@ class DictionaryViewModel @Inject constructor(
     }
 
     private fun getAllDictionaries() {
-        viewModelScope.launch {
-            dictionaryRepository.getAllDictionaries {
-                when(it) {
-                    is UiState.Error -> {
-                        state = state.copy(
-                            isLoading = false,
-                            errors = it.message
-                        )
-                    }
-                    is UiState.Loading ->{
-                        state = state.copy(
-                            isLoading = true,
-                            errors = null,
-                        )
-                    }
-                    is UiState.Success ->     {
-                        state = state.copy(
-                            isLoading = false,
-                            errors = null,
-                            dictionaryList = it.data,
-
-                        )
-                    }
-                }
-            }
-        }
+        val paging =  dictionaryRepository.getDictionaryEntries().cachedIn(viewModelScope)
+       state = state.copy(
+           dictionaryList = paging,
+           words = paging
+       )
     }
+
 }

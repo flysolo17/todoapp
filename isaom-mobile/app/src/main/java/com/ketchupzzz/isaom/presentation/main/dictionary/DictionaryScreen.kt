@@ -22,10 +22,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DictionaryScreen(modifier: Modifier = Modifier,
-                     navHostController: NavHostController,
-                     state: DictionaryState,
-                     events : (DictionaryEvents) -> Unit
+fun DictionaryScreen(
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController,
+    state: DictionaryState,
+    events : (DictionaryEvents) -> Unit
 ) {
     val context = LocalContext.current
     LaunchedEffect(state) {
@@ -35,7 +36,7 @@ fun DictionaryScreen(modifier: Modifier = Modifier,
     }
     Column(modifier = modifier.fillMaxSize()) {
         if (state.users == null) {
-            WordsScreen(state = state, events = events, dictionaryList = state.dictionaryList)
+            WordsScreen(state = state, events = events)
         } else {
             val pageState = rememberPagerState(pageCount = {2})
             val scope  = rememberCoroutineScope()
@@ -64,16 +65,15 @@ fun DictionaryScreen(modifier: Modifier = Modifier,
 
             HorizontalPager(state = pageState) {page ->
                 if (page == 0) {
-                    WordsScreen(state = state, events = events, dictionaryList = state.dictionaryList)
+                    WordsScreen(state = state, events = events)
                 } else {
                     FavoriteScreen(
                         state = state,
-                        events = events
+                        events = events,
                     )
                 }
             }
         }
-
-
     }
 }
+

@@ -49,7 +49,7 @@ import com.ketchupzzz.isaom.R
 import com.ketchupzzz.isaom.models.Gender
 import com.ketchupzzz.isaom.presentation.auth.register.RegisterEvents
 import com.ketchupzzz.isaom.presentation.auth.register.RegisterState
-import com.ketchupzzz.isaom.presentation.routes.AppRouter
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

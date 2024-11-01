@@ -79,11 +79,12 @@ dependencies {
     //courotines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 
-
     //Google fonts
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.7")
+
     //navagation
     implementation("androidx.navigation:navigation-compose:2.7.7")
+
     //viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
 
@@ -96,9 +97,7 @@ dependencies {
 
     //window size
     implementation ("androidx.compose.material3:material3-window-size-class:1.2.1")
-
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
-
     implementation("io.coil-kt:coil-compose:2.6.0")
 
 
@@ -108,7 +107,6 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation ("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
-
 
 
     //rich text editor
@@ -121,13 +119,24 @@ dependencies {
 
     implementation("de.charlex.compose.material3:material3-html-text:2.0.0-beta01")
 
-
-
     //ml kit
     implementation ("com.google.mlkit:text-recognition:16.0.1")
 
     //charts
     implementation ("io.github.ehsannarmani:compose-charts:0.0.13")
+
+
+    // Paging
+    implementation ("androidx.paging:paging-runtime-ktx:3.1.1")
+    implementation ("androidx.paging:paging-compose:1.0.0-alpha18")
+
+
+//    // Room
+//    implementation ("androidx.room:room-ktx:2.5.1")
+//    kapt ("androidx.room:room-compiler:2.5.1")
+//    implementation ("androidx.room:room-paging:2.5.1")
+
+
 }
 
 

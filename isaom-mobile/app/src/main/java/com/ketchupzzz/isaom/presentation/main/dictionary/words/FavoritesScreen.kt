@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,11 +30,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.ketchupzzz.isaom.R
-import com.ketchupzzz.isaom.models.dictionary.Favorites
+import com.ketchupzzz.isaom.models.dictionary.remote.Favorites
 import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryEvents
 import com.ketchupzzz.isaom.presentation.main.dictionary.DictionaryState
 import com.ketchupzzz.isaom.ui.custom.WebViewDialog
-import com.ketchupzzz.isaom.utils.generateRandomString
 
 
 @Composable
@@ -42,6 +42,13 @@ fun FavoriteScreen(modifier: Modifier = Modifier,
                    events: (DictionaryEvents) -> Unit
 ) {
     val context = LocalContext.current
+    LaunchedEffect(state) {
+        if (state.users != null) {
+            events.invoke(DictionaryEvents.OnGetDictionary(
+                uid = state.users.id ?: ""
+            ))
+        }
+    }
     if (state.isLoading) {
         Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator()

@@ -58,26 +58,22 @@ import com.ketchupzzz.isaom.utils.toast
 import kotlinx.coroutines.delay
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier,
-                navHostController: NavHostController,
-                state : LoginState,
-                events: (LoginEvents) -> Unit
+fun LoginScreen(
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController,
+    state : LoginState,
+    events: (LoginEvents) -> Unit
 ) {
     val context = LocalContext.current
     LaunchedEffect(state) {
         if (state.isLoggedIn) {
             Toast.makeText(context,"Successfully Logged in",Toast.LENGTH_SHORT).show()
             delay(1000)
-            if (state.users?.verified == false) {
-                navHostController.navigate(AppRouter.VerificationScreen.route)
-                return@LaunchedEffect
-            }
-            if (state.users?.type === UserType.TEACHER) {
-                navHostController.navigate(AppRouter.TeacherRoutes.route)
-            } else {
+            if (state.users?.verified == true) {
                 navHostController.navigate(AppRouter.MainRoutes.route)
+            } else {
+                navHostController.navigate(AppRouter.VerificationScreen.route)
             }
-
         }
         if (state.error !== null) {
             Toast.makeText(context,state.error,Toast.LENGTH_SHORT).show()
@@ -117,7 +113,8 @@ fun LoginForm(modifier: Modifier = Modifier, navHostController: NavHostControlle
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedTextField(state.email.value,
+            OutlinedTextField(
+                state.email.value,
                 onValueChange = {
                     events(LoginEvents.OnEmailChanged(it))
                 },
@@ -199,7 +196,7 @@ fun LoginForm(modifier: Modifier = Modifier, navHostController: NavHostControlle
                     contentColor = Color.White
 
                 ),
-                onClick = { context.toast("Not implemented yet")
+                onClick = {  navHostController.navigate(AppRouter.MainRoutes.route)
             }) {
                 Text(
                     text = "Login as Guest",

@@ -4,13 +4,18 @@ import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObjects
+import com.google.firebase.firestore.toObjects
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ketchupzzz.isaom.models.Users
-import com.ketchupzzz.isaom.models.games.GameType
 import com.ketchupzzz.isaom.models.games.Games
 import com.ketchupzzz.isaom.models.WordTranslate
-import com.ketchupzzz.isaom.models.games.GamesWithStudent
+import com.ketchupzzz.isaom.models.games.GameSubmission
+import com.ketchupzzz.isaom.models.games.Levels
+import com.ketchupzzz.isaom.models.games.UserWithGameSubmissions
+import com.ketchupzzz.isaom.models.games.getMyHighestScorePerGameID
+
 import com.ketchupzzz.isaom.repository.auth.USERS_COLLECTION
 
 import com.ketchupzzz.isaom.utils.UiState
@@ -27,97 +32,94 @@ class GameRepositoryImpl(
     val auth : FirebaseAuth,
     val firestore : FirebaseFirestore
 ): GameRepository {
-    override suspend fun getWordsFromAssets(result: (UiState<List<WordTranslate>>) -> Unit) {
 
-            try {
-                val jsonString = context.assets.open("dictionary.json").bufferedReader().use { it.readText() }
-                val wordListType = object : TypeToken<List<WordTranslate>>() {}.type
-                val wordList: List<WordTranslate> = Gson().fromJson(jsonString, wordListType)
-                withContext(Dispatchers.Main) {
-                    delay(1000)
-                    result(UiState.Success(wordList))
-                }
-            } catch (e: IOException) {
-                withContext(Dispatchers.Main) {
-                    result(UiState.Error(e.message ?: "An error occurred"))
-                }
-            }
 
-    }
-
-    override suspend fun getLeaderboard(result: (UiState<Games>) -> Unit) {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            result.invoke(UiState.Error("No user found!"))
-            return
-        }
+    override suspend fun getAllGames(result: (UiState<List<Games>>) -> Unit) {
+        result(UiState.Loading)
         firestore.collection(GAME_COLLECTION)
-            .whereEqualTo("studentID",currentUser.uid)
-            .limit(1)
             .addSnapshotListener { value, error ->
-            value?.let {
-                val first = it.toObjects(Games::class.java).firstOrNull()
-                if (first == null) {
-                    val game = Games(
-                        id = generateRandomString(10),
-                        studentID = currentUser.uid,
-                        score = 0.00,
-                        level = 0,
-                        gameType = GameType.WORD_TRANSLATION
-                    )
-                    firestore
-                        .collection(GAME_COLLECTION)
-                        .document(game.id!!)
-                        .set(game)
-                        .addOnCompleteListener {
-                            result.invoke(UiState.Success(game))
-                        }.addOnFailureListener {
-                            result.invoke(UiState.Error(it.message.toString()))
-                        }
-                    return@let
+                value?.let {
+                    result(UiState.Success(it.toObjects(Games::class.java)))
                 }
-                result.invoke(UiState.Success(first))
+                error?.let {
+                    result(UiState.Error(it.message.toString()))
+                }
             }
-        }
     }
 
-    override suspend fun updateGame(gameID: String) {
+    override suspend fun getAllLevels(gameID: String, result: (UiState<List<Levels>>) -> Unit) {
+        result.invoke(UiState.Loading)
+        delay(1000)
         firestore.collection(GAME_COLLECTION)
             .document(gameID)
-            .update(
-                "level" ,FieldValue.increment(1),
-                "score",FieldValue.increment(1)
-            )
+            .collection(LEVELS_COLLECTION)
+            .get()
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val data = it.result.toObjects(Levels::class.java).shuffled()
+                    result.invoke(UiState.Success(data))
+                } else {
+                    result.invoke(UiState.Error("Something wrong fetching levels"))
+                }
+            }.addOnFailureListener {
+                result(UiState.Error(it.message.toString()))
+            }
     }
 
-    override suspend fun getGamesWithStudents(result: (UiState<List<GamesWithStudent>>) -> Unit) {
-        try {
-            result.invoke(UiState.Loading)
+    override suspend fun submitScore(
+        gameSubmission: GameSubmission,
+        result: (UiState<String>) -> Unit
+    ) {
+        result.invoke(UiState.Loading)
+        firestore.collection(GAME_SUBMISSIONS)
+            .document(gameSubmission.id!!)
+            .set(gameSubmission)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    result.invoke(UiState.Success("Submitted"))
+                } else {
+                    result.invoke(UiState.Error("Something wrong levels"))
+                }
+            }.addOnFailureListener {
+                result(UiState.Error(it.message.toString()))
+            }
+    }
 
-            val gamesSnapshot = firestore.collection("games")
-                .orderBy("score", com.google.firebase.firestore.Query.Direction.DESCENDING)
+    override suspend fun getScores(result: (UiState<List<UserWithGameSubmissions>>) -> Unit) {
+        result.invoke(UiState.Loading)
+        try {
+            val submissions = firestore.collection(GAME_SUBMISSIONS)
                 .get()
                 .await()
+                .toObjects(GameSubmission::class.java)
+            val users = firestore
+                .collection(USERS_COLLECTION)
+                .get()
+                .await()
+                .toObjects(Users::class.java)
 
-            val gamesList = gamesSnapshot.toObjects(Games::class.java)
-            val gamesWithStudentList = mutableListOf<GamesWithStudent>()
-
-            for (game in gamesList) {
-                val studentSnapshot = firestore.collection(USERS_COLLECTION)
-                    .document(game.studentID ?: "")
-                    .get()
-                    .await()
-                val student = studentSnapshot.toObject(Users::class.java)
-                gamesWithStudentList.add(GamesWithStudent(games = game, student = student))
-            }
-            result.invoke(UiState.Success(gamesWithStudentList))
-        } catch (e: Exception) {
-            result.invoke(UiState.Error(e.message ?: "An error occurred"))
+            val userWithHighestScores = submissions
+                .groupBy { it.userID }
+                .mapNotNull { (userID, userSubmissions) ->
+                    userID?.let { id ->
+                        val user = users.first { it.id == id }
+                        val highestScoresPerGame = userSubmissions.getMyHighestScorePerGameID()
+                        val totalScore = highestScoresPerGame.sumOf { it.score }
+                        UserWithGameSubmissions(user = user, submission =  highestScoresPerGame , totalScore = totalScore)
+                    }
+                }
+            result(UiState.Success(userWithHighestScores))
+        } catch (e : Exception) {
+            result(UiState.Error(e.message.toString()))
         }
     }
+
 
     companion object {
         const val GAME_COLLECTION = "games"
+        const val LEVELS_COLLECTION = "levels"
+        const val GAME_SUBMISSIONS = "matches"
     }
+
 
 }

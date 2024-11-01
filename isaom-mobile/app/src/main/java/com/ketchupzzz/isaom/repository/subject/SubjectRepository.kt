@@ -22,5 +22,9 @@ interface SubjectRepository  {
     )
 
     suspend fun getMySubjects(studentID: String,result: (UiState<List<Subjects>>) -> Unit)
-    suspend fun joinSubject(studentID : String,sections : List<String>,code : String,result: (UiState<String>) -> Unit)
+    suspend fun getSubjectByCode(studentID: String,sections : List<String>,code: String,result: (UiState<Subjects>) -> Unit)
+    suspend fun joinSubject(studentID : String,subjectID  : String,result: (UiState<String>) -> Unit)
+
+
+
 }

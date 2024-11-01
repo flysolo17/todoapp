@@ -24,7 +24,7 @@ import androidx.navigation.NavHostController
 import com.ketchupzzz.isaom.R
 import com.ketchupzzz.isaom.models.UserType
 import com.ketchupzzz.isaom.presentation.routes.AppRouter
-import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.activities.view_activity.ViewActivityEvents
+
 import com.ketchupzzz.isaom.ui.custom.PrimaryButton
 import kotlinx.coroutines.delay
 
@@ -46,12 +46,8 @@ fun VerificationScreen(
         if (state.isVerified) {
             Toast.makeText(context, "Successfully Verified", Toast.LENGTH_SHORT).show()
             if (state.users != null) {
-                val route = if (state.users.type == UserType.TEACHER) {
-                    AppRouter.TeacherRoutes.route
-                } else {
-                    AppRouter.MainRoutes.route
-                }
-                navHostController.navigate(route)
+
+                navHostController.navigate(AppRouter.MainRoutes.route)
             }
 
         }

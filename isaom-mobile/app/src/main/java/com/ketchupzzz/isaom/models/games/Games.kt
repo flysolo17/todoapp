@@ -1,13 +1,12 @@
 package com.ketchupzzz.isaom.models.games
 
-data class Games(
-    val id : String ? = null,
-    val studentID : String ? = null,
-    val score : Double ? = 0.00,
-    val level : Int = 0,
-    val gameType: GameType? = GameType.WORD_TRANSLATION
-)
 
-enum class GameType {
-    WORD_TRANSLATION
-}
+import java.util.Date
+
+data class Games(
+    val id : String  ? = null,
+    val title : String ? = "",
+    val timer : Int = 0,
+    val cover : String ? = null,
+    val createdAt : Date = Date()
+)

@@ -21,8 +21,9 @@ import androidx.navigation.NavHostController
 import com.ketchupzzz.isaom.models.Gender
 import com.ketchupzzz.isaom.models.Users
 import com.ketchupzzz.isaom.presentation.auth.register.RegisterEvents
-import com.ketchupzzz.isaom.presentation.main.IsaomTopBar
+
 import com.ketchupzzz.isaom.ui.custom.PrimaryButton
+import com.ketchupzzz.isaom.utils.IsaomTopBar
 import kotlinx.coroutines.delay
 
 
@@ -58,44 +59,37 @@ fun EditProfileScreen(
             navHostController.popBackStack()
         }
     }
-    Scaffold(
-        topBar = { IsaomTopBar(title = "Edit Profile", hasNavigationIcon = true) {
-            navHostController.popBackStack()
-        }}
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(8.dp)
-        ){
-            Text(text = "* Required", color = MaterialTheme.colorScheme.error)
-            OutlinedTextField(value = state.name.value, onValueChange = {
-                events.invoke(EditProfileEvents.OnNameChange(it))
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ){
+        Text(text = "* Required", color = MaterialTheme.colorScheme.error)
+        OutlinedTextField(value = state.name.value, onValueChange = {
+            events.invoke(EditProfileEvents.OnNameChange(it))
+        },
+            modifier = modifier.fillMaxWidth(),
+            isError = state.name.isError,
+            label = {
+                Text(text = "Fullname")
             },
-                modifier = modifier.fillMaxWidth(),
-                isError = state.name.isError,
-                label = {
-                    Text(text = "Fullname")
-                },
-                supportingText = {
-                    Text(
-                        text =   state.name.errorMessage ?: "" ,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.labelSmall,
-                        textAlign = TextAlign.Start
-                    )
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(8.dp)
-            )
-            Spacer(modifier = modifier.weight(1f))
-            PrimaryButton(onClick = { events.invoke(EditProfileEvents.OnSaveChanges(
-                users.id ?: "",
-                name = state.name.value,
-            ))}, isLoading = state.isSaving) {
-                Text(text = "Save")
-            }
+            supportingText = {
+                Text(
+                    text =   state.name.errorMessage ?: "" ,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelSmall,
+                    textAlign = TextAlign.Start
+                )
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(8.dp)
+        )
+        Spacer(modifier = modifier.weight(1f))
+        PrimaryButton(onClick = { events.invoke(EditProfileEvents.OnSaveChanges(
+            users.id ?: "",
+            name = state.name.value,
+        ))}, isLoading = state.isSaving) {
+            Text(text = "Save")
         }
     }
 }

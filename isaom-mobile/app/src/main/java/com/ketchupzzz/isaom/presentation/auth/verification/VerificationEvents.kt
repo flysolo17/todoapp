@@ -1,7 +1,6 @@
 package com.ketchupzzz.isaom.presentation.auth.verification
 
 import android.content.Context
-import com.ketchupzzz.isaom.presentation.teacher.subject.view_subject.ViewSubjectEvents
 
 
 sealed interface VerificationEvents {

@@ -13,5 +13,4 @@ data class LoginState(
     val error : String? = null,
     val isLoggedIn : Boolean = false,
     val users : Users? = null,
-) {
-}
+)

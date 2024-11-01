@@ -247,37 +247,50 @@ class SubjectRepositoryImpl(private val firestore: FirebaseFirestore,private val
             }
     }
 
-    override suspend fun joinSubject(
+    override suspend fun getSubjectByCode(
         studentID: String,
-        sections : List<String>,
+        sections: List<String>,
         code: String,
-        result: (UiState<String>) -> Unit,
+        result: (UiState<Subjects>) -> Unit
     ) {
-        if (sections.isEmpty()) {
-            result.invoke(UiState.Error("No Sections yet!"))
-            return
-        }
-
-        val subjects = firestore
-            .collection(SUBJECT_COLLECTION)
-            .whereIn("sectionID",sections)
-            .whereEqualTo("code",code)
-            .get()
-            .await()
-            .toObjects<Subjects>()
-        if (subjects.isEmpty()) {
-            result.invoke(UiState.Error("No Subject Found!"))
-            return
-        }
-        subjects.forEach {
-            if (it.students.contains(studentID)) {
-                result.invoke(UiState.Success("You already joined the subject"))
+        try {
+            if (sections.isEmpty()) {
+                result.invoke(UiState.Error("No Sections yet!"))
                 return
             }
+            result.invoke(UiState.Loading)
+            val subjects = firestore
+                .collection(SUBJECT_COLLECTION)
+                .whereIn("sectionID",sections)
+                .whereEqualTo("code",code)
+                .get()
+                .await()
+                .toObjects<Subjects>()
+            if (subjects.isEmpty()) {
+                result.invoke(UiState.Error("No Subject Found!"))
+                return
+            }
+            subjects.forEach {
+                if (it.students.contains(studentID)) {
+                    result.invoke(UiState.Error("You already joined the subject"))
+                    return
+                }
+            }
+            val subject = subjects.first()
+            result.invoke(UiState.Success(subject))
+        } catch (e : Exception) {
+            result.invoke(UiState.Error(e.message.toString()))
         }
-        val subject = subjects.first()
+    }
 
-        firestore.collection(SUBJECT_COLLECTION).document(subject.id!!)
+
+    override suspend fun joinSubject(
+        studentID: String,
+        subjectID: String,
+        result: (UiState<String>) -> Unit,
+    ) {
+        result.invoke(UiState.Loading)
+        firestore.collection(SUBJECT_COLLECTION).document(subjectID)
             .update("students",FieldValue.arrayUnion(studentID))
             .addOnCompleteListener {
                 if (it.isSuccessful) {

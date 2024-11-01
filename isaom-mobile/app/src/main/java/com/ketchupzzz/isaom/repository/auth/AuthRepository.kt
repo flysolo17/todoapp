@@ -30,11 +30,12 @@ interface AuthRepository {
         result: (UiState<String>) -> Unit
     )
 
-    fun forgotPassword(email : String,result: (UiState<String>) -> Unit)
 
 
 
     suspend fun getAllGenderSelection(result: (UiState<GenderSelection>) -> Unit)
+
+    fun forgotPassword(email : String,result: (UiState<String>) -> Unit)
 
     suspend fun changePassword(oldPassword : String,newPassword : String,result: (UiState<String>) -> Unit)
     suspend fun updateUserInfo(

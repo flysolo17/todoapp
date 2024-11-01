@@ -13,11 +13,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
+
     var state by mutableStateOf(LoginState())
+
     init {
         onEvent(LoginEvents.OnGetCurrentUser)
     }
@@ -31,7 +32,6 @@ class LoginViewModel @Inject constructor(
                     isPasswordVisible = !state.isPasswordVisible
                 )
             }
-
             LoginEvents.OnGetCurrentUser -> getCurrentUser()
         }
     }
@@ -74,6 +74,7 @@ class LoginViewModel @Inject constructor(
             )
             return
         }
+
         authRepository.login(email = id.value, password = password.value) {
             state = when(it) {
                 is UiState.Error -> {
@@ -88,8 +89,8 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
-
     }
+
     private fun emailChanged(email : String) {
         val hasError =  !Patterns.EMAIL_ADDRESS.matcher(email).matches() || email.hasSpaces()
         val errorMessage = if (hasError)  {
